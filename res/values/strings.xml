@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">prayerNotes</string>
+    <string name="date_created">Date Created: </string>
+    <string name="last_prayed_for">Last Prayed For: </string>
 </resources>

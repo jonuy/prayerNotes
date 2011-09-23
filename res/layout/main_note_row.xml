@@ -10,10 +10,10 @@
 		android:orientation="horizontal"
 		>
 		<ImageView android:id="@+id/main_note_row_img"
-			android:layout_width="10dp"
-			android:layout_height="10dp"
+			android:layout_width="40dp"
+			android:layout_height="40dp"
 			android:visibility="gone"
-			/>	
+			/>
 		<TextView android:id="@+id/main_note_row_text"
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"/>
@@ -23,15 +23,31 @@
 		android:layout_height="wrap_content"
 		android:orientation="horizontal"
 		>
-		<TextView android:id="@+id/main_note_row_dateAdded"
+		<TextView android:id="@+id/main_note_row_created_text"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
+			android:textSize="10sp"
+			android:text="@string/date_created"
+			/>
+		<TextView android:id="@+id/main_note_row_created"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textSize="10sp"
+			android:layout_toRightOf="@id/main_note_row_created_text"
 			/>
 		<TextView android:id="@+id/main_note_row_status"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:textSize="10sp"
 			android:layout_alignParentRight="true"
+			/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toLeftOf="@id/main_note_row_status"
+			android:textSize="10sp"
+			android:text="@string/last_prayed_for"
 			/>
 	</RelativeLayout>
 </LinearLayout>
