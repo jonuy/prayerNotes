@@ -7,6 +7,7 @@
 	android:layout_height="fill_parent" >
 	
 	<TextView
+		android:text="@string/edit_note_text_title"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"/>
 	<EditText android:id="@+id/edit_note_text"
@@ -16,20 +17,24 @@
 		android:maxLines="10"
 		android:textSize="10dp"/>
 		
-		<RelativeLayout
-			android:orientation="horizontal"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent">
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+		
+		<!-- TODO: consider adding padding around the buttons -->
+		<Button android:id="@+id/edit_note_save"
+			android:text="@string/edit_save_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/edit_note_share"
+			android:text="@string/edit_share_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/edit_note_discard"
+			android:text="@string/edit_discard_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
 			
-			<!-- TODO: consider adding padding around the buttons -->
-			<Button android:id="@+id/edit_note_save"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentLeft="true"/>
-			<Button android:id="@+id/edit_note_discard"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"/>
-				
-		</RelativeLayout>
+	</LinearLayout>
 </LinearLayout>

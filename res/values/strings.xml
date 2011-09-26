@@ -3,4 +3,11 @@
     <string name="app_name">prayerNotes</string>
     <string name="date_created">Date Created: </string>
     <string name="last_prayed_for">Last Prayed For: </string>
+    <string name="new_note_title">Create a prayerNote</string>
+    <string name="edit_note_title">Edit a prayerNote</string>
+    <string name="edit_save_button">Save</string>
+    <string name="edit_discard_button">Discard</string>
+    <string name="edit_delete_button">Delete</string>
+    <string name="edit_share_button">Save/Share</string>
+    <string name="edit_note_text_title">Edit prayerNote:</string>
 </resources>

@@ -33,6 +33,7 @@ public class PrayerNotes extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_list);
+        //setTitle(R.string.app_name)
         
         mDbAdapter = new PNDbAdapter(this);
         mDbAdapter.open();
