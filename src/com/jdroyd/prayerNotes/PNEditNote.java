@@ -1,7 +1,5 @@
 package com.jdroyd.prayerNotes;
 
-import java.util.Calendar;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -74,20 +72,13 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private void saveState() {
 		String noteText = mNoteText.getText().toString();
 		
-		Calendar cal = Calendar.getInstance();
-		
-		int month = cal.get(Calendar.MONTH);
-		int day = cal.get(Calendar.DATE);
-		int year = cal.get(Calendar.YEAR);
-		int packedDate = month << 24 | day << 16 | year;
-		
 		if( mDbRowId == null ) {
-			long id = mDbHelper.createNote(noteText, packedDate);
+			long id = mDbHelper.createNote(noteText, mDbHelper.getCurrentDateForDb());
 			if( id >= 0 )
 				mDbRowId = id;
 		}
 		else {
-			mDbHelper.updateNote(mDbRowId, noteText, packedDate);
+			mDbHelper.updateNote(mDbRowId, noteText, mDbHelper.getCurrentDateForDb());
 		}
 	}
 	

@@ -5,6 +5,9 @@
 
 package com.jdroyd.prayerNotes;
 
+import java.text.DateFormatSymbols;
+import java.util.Calendar;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -100,6 +103,39 @@ public class PNDbAdapter {
 	 */
 	public void close() {
 		mDbHelper.close();
+	}
+	
+	/**
+	 * 
+	 */
+	public int getCurrentDateForDb() {
+		Calendar cal = Calendar.getInstance();
+		int month = cal.get(Calendar.MONTH);
+		int day = cal.get(Calendar.DATE);
+		int year = cal.get(Calendar.YEAR);
+		int packedDate = month << 24 | day << 16 | year;
+		
+		return packedDate;
+	}
+	
+	public String convertDbDateToString(Integer packedDate) {
+		String unpackedDate = null;
+		
+		if( packedDate != null ) {
+			Integer year = packedDate & 0xFFFF;
+			Integer day = (packedDate >> 16) & 0xFF;
+			Integer month = (packedDate >> 24) & 0xFF;
+			
+			unpackedDate = getLocalizedMonth(month) + " " + day.toString() + ", " + year.toString();
+		}
+		
+		return unpackedDate;
+	}
+	
+	private String getLocalizedMonth(int month) {
+		DateFormatSymbols dfs = new DateFormatSymbols();
+		String[] strMonths = dfs.getMonths();
+		return strMonths[month];
 	}
 	
 	//TODO:  createNote() with all possible columns for params?

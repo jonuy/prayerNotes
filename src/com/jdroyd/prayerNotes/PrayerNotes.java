@@ -8,7 +8,9 @@ import java.util.Map;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -76,40 +78,67 @@ public class PrayerNotes extends ListActivity {
      * 
      */
     private void populateList() {
-    	/*
     	// Get all of the rows from the database
     	// TODO: should only get the 10 or 20 most recent
     	// TODO: notes that aren't marked as prayed-for should go first
     	Cursor notesCursor = mDbAdapter.getAllNotes();
     	startManagingCursor(notesCursor);
     	
-    	// TODO: build ArrayList from data in Cursor
-    	*/
-    	
-    	ArrayList <HashMap<String,Object>> tmpList = 
+    	ArrayList <HashMap<String,Object>> noteList = 
     		new ArrayList<HashMap<String,Object>>();
     	
-    	HashMap<String,Object> tmp;
-    	
-    	tmp = new HashMap<String,Object>();
-    	tmp.put(PNDbAdapter.PNKEY_NOTE_TEXT, "This is a note #1 with a lot more text that will hopefully wrap and wrap and wrap and wrap.");
-    	//tmp.put(PNDbAdapter.PNKEY_NOTE_IMG, R.drawable.icon);
-    	tmp.put(PNDbAdapter.PNKEY_DATE_CREATED, "Sat, Sep 24, 2011");
-    	tmp.put(PNDbAdapter.PNKEY_LAST_PRAYED, "Never");
-    	tmpList.add(tmp);
-    	
-    	tmp = new HashMap<String,Object>();
-    	tmp.put(PNDbAdapter.PNKEY_NOTE_TEXT, "This is a note #2.");
-    	tmp.put(PNDbAdapter.PNKEY_NOTE_IMG, R.drawable.icon);
-    	tmp.put(PNDbAdapter.PNKEY_DATE_CREATED, "Fri, Sep 23, 2011");
-    	tmp.put(PNDbAdapter.PNKEY_LAST_PRAYED, "Yesterday");
-    	tmpList.add(tmp);
-    	
-    	tmp = new HashMap<String,Object>();
-    	tmp.put(PNDbAdapter.PNKEY_NOTE_TEXT, "And then this is the note #3 with a lot more text that will hopefully wrap and wrap and wrap and wrap.");
-    	tmp.put(PNDbAdapter.PNKEY_DATE_CREATED, "Sat, Sep 24, 2124");
-    	tmp.put(PNDbAdapter.PNKEY_LAST_PRAYED, "Never");
-    	tmpList.add(tmp);
+    	if( notesCursor != null ) {
+    		if( notesCursor.moveToFirst() ) {
+	    		while( notesCursor.isAfterLast() == false ) {
+	    			int pos = notesCursor.getPosition();
+	    			String noteText = notesCursor.getString( 
+	    					notesCursor.getColumnIndexOrThrow(PNDbAdapter.PNKEY_NOTE_TEXT) );
+	    			String noteImg = notesCursor.getString( 
+	    					notesCursor.getColumnIndexOrThrow(PNDbAdapter.PNKEY_NOTE_IMG) );
+	    			int dateCreated = notesCursor.getInt( 
+	    					notesCursor.getColumnIndexOrThrow(PNDbAdapter.PNKEY_DATE_CREATED) );
+	    			int lastPrayed = notesCursor.getInt( 
+	    					notesCursor.getColumnIndexOrThrow(PNDbAdapter.PNKEY_LAST_PRAYED) );
+	    			
+	    			Log.v("POP", pos+": noteText = "+noteText);
+	    			Log.v("POP", pos+": noteImg = "+noteImg);
+	    			Log.v("POP", pos+": dateCreated = "+dateCreated);
+	    			Log.v("POP", pos+": lastPrayed = "+lastPrayed);
+	    			
+	    			HashMap<String,Object> noteHash = new HashMap<String,Object>();
+	    			
+	    			// Get note text
+	    			if( noteText != null ) {
+	    				noteHash.put(PNDbAdapter.PNKEY_NOTE_TEXT, noteText);
+	    			}
+	    			
+	    			// Get image data
+	    			if( noteImg != null ) {
+	    				//noteHash.put(PNDbAdapter.PNKEY_NOTE_IMG, R.drawable.icon);
+	    				;// TODO: how do we set the image?
+	    			}
+	    			
+	    			// Get date created
+	    			String strDateCreated = getResources().getText(R.string.unknown_date).toString();
+	    			if( dateCreated > 0 ) {
+	    				strDateCreated = mDbAdapter.convertDbDateToString(dateCreated);
+	    			}
+	    			noteHash.put(PNDbAdapter.PNKEY_DATE_CREATED, strDateCreated);
+	    			
+	    			// Get LastPrayed data
+	    			String strLastPrayed = getResources().getText(R.string.unknown_date).toString();
+	    			if( lastPrayed > 0 ) {
+	    				strLastPrayed = mDbAdapter.convertDbDateToString(lastPrayed);
+	    			}
+	    			noteHash.put(PNDbAdapter.PNKEY_LAST_PRAYED, strLastPrayed);
+	    			
+	    			// Add recovered data into the ArrayList
+	    			noteList.add(noteHash);
+	    			
+	    			notesCursor.moveToNext();
+	    		}
+    		}
+    	}
     	
     	String[] fromColumns = new String[]{PNDbAdapter.PNKEY_NOTE_TEXT,
     			PNDbAdapter.PNKEY_NOTE_IMG, PNDbAdapter.PNKEY_DATE_CREATED,
@@ -119,7 +148,7 @@ public class PrayerNotes extends ListActivity {
     			R.id.main_note_row_img, R.id.main_note_row_created,
     			R.id.main_note_row_status};
 
-    	PNViewAdapter notes = new PNViewAdapter(this, tmpList,
+    	PNViewAdapter notes = new PNViewAdapter(this, noteList,
     			R.layout.main_note_row, fromColumns, toFields);
     	
     	setListAdapter(notes);

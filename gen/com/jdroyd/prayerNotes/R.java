@@ -40,6 +40,8 @@ public final class R {
         public static final int edit_save_button=0x7f040005;
         public static final int edit_share_button=0x7f040008;
         public static final int last_prayed_for=0x7f040002;
+        public static final int main_list_empty=0x7f04000a;
         public static final int new_note_title=0x7f040003;
+        public static final int unknown_date=0x7f04000b;
     }
 }

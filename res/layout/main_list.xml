@@ -29,6 +29,7 @@
     	/>
     <!-- Optional view if no data is present for the list -->
     <TextView android:id="@+id/android:empty"
+    	android:text="@string/main_list_empty"
     	android:layout_width="wrap_content"
     	android:layout_height="wrap_content"
     	/>
