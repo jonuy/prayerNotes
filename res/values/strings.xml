@@ -12,4 +12,5 @@
     <string name="edit_note_text_title">Edit prayerNote:</string>
     <string name="main_list_empty">No prayerNotes saved.  Create a new one!</string>
     <string name="unknown_date">Unknown</string>
+    <string name="context_menu_delete">Delete prayerNote</string>
 </resources>

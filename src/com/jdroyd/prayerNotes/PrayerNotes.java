@@ -11,18 +11,23 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class PrayerNotes extends ListActivity {
 	
 	//TODO: make this an enum?  place in constants file?
 	public static final int ACTIVITY_CREATE = 0;
 	public static final int ACTIVITY_EDIT = 1;
+	public static final int CONTEXT_DELETE_ID = 0;
 	
 	//
 	private PNDbAdapter mDbAdapter;
@@ -53,24 +58,37 @@ public class PrayerNotes extends ListActivity {
         		createPrayerNote();
         	}
         });
+        
+        // Register ListView for context menus
+        registerForContextMenu(getListView());
     }
     
     /**
      * Start Activity to edit note when a ListView item is clicked
      */
-    @SuppressWarnings("unchecked")
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		
-		HashMap<String,Object> tmp = (HashMap<String,Object>)getListView().getItemAtPosition(position);
-		int rowId = (Integer)tmp.get(PNDbAdapter.PNKEY_ROWID);
-		
+		long rowId = getRowIdFromListAtPosition(position);
 		Log.v("PN", "onListItemClick() rowId: "+rowId);
 		
 		editPrayerNote(rowId);
 	}
     
+    /**
+     * 
+     */
+	@SuppressWarnings("unchecked")
+    private long getRowIdFromListAtPosition(int position) {
+    	HashMap<String,Object> tmp = (HashMap<String,Object>)getListView().getItemAtPosition(position);
+		int rowId = (Integer)tmp.get(PNDbAdapter.PNKEY_ROWID);
+		return (long)rowId;
+    }
+    
+    /**
+     * Launch a new activity to create a note
+     */
     private void createPrayerNote() {
     	Intent i = new Intent(this, PNEditNote.class);
     	startActivityForResult(i, ACTIVITY_CREATE);
@@ -226,5 +244,33 @@ public class PrayerNotes extends ListActivity {
 				v.setVisibility(View.VISIBLE);
 			}
 		}    	
+    }
+    
+    /**
+     * Context menu function overrides
+     */
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+    		ContextMenuInfo menuInfo) {
+    	super.onCreateContextMenu(menu, v, menuInfo);
+    	menu.add(0, CONTEXT_DELETE_ID, 0, R.string.context_menu_delete);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+    	
+    	switch(item.getItemId()) {
+    	case CONTEXT_DELETE_ID:
+    		AdapterContextMenuInfo info = (AdapterContextMenuInfo)item.getMenuInfo();
+    		if( info != null ) {
+	    		mDbAdapter.deleteNote(getRowIdFromListAtPosition(info.position));
+	    		populateList();
+    		}
+    		
+    		return true;
+    	}
+    	
+    	return super.onContextItemSelected(item);
     }
 }
