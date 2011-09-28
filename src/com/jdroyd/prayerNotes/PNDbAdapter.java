@@ -65,7 +65,7 @@ public class PNDbAdapter {
 		+ ");";
 	
 	// Name of the database file
-	private static final String PN_DATABASE_FILE_NAME = "prayerNotesDb";
+	public static final String PN_DATABASE_FILE_NAME = "prayerNotesDb";
 	
 	// Database version number
 	// onUpgrade() used if Db version is upgraded
@@ -106,7 +106,9 @@ public class PNDbAdapter {
 	}
 	
 	/**
-	 * 
+	 * Gets current date from Calendar and packs its value into a single int
+	 * (month) << 24 | (day) << 16 | (year)
+	 * @return packed integer of the current date 
 	 */
 	public int getCurrentDateForDb() {
 		Calendar cal = Calendar.getInstance();
@@ -118,6 +120,11 @@ public class PNDbAdapter {
 		return packedDate;
 	}
 	
+	/**
+	 * Converts the packed int from the database into readable String
+	 * @param packedDate Assumed packed int from database
+	 * @return human-readable String
+	 */
 	public String convertDbDateToString(Integer packedDate) {
 		String unpackedDate = null;
 		
@@ -132,6 +139,11 @@ public class PNDbAdapter {
 		return unpackedDate;
 	}
 	
+	/**
+	 * Takes num value of a month and returns its corresponding localized string
+	 * @param month Numerical value of Calendar month 
+	 * @return localized String value of requested month
+	 */
 	private String getLocalizedMonth(int month) {
 		DateFormatSymbols dfs = new DateFormatSymbols();
 		String[] strMonths = dfs.getMonths();
@@ -159,9 +171,9 @@ public class PNDbAdapter {
 	}
 	
 	/**
-	 * 
-	 * @param rowId
-	 * @return
+	 * Deletes the note at the provided row id
+	 * @param rowId PNKEY_ROWID to match
+	 * @return true if a note was deleted.  false otherwise.
 	 */
 	public boolean deleteNote(long rowId) {
 		return mDb.delete(	PN_DATABASE_TABLE_NAME, 
@@ -170,8 +182,8 @@ public class PNDbAdapter {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Gets all notes in the database
+	 * @return Cursor to all retrieved rows
 	 */
 	public Cursor getAllNotes() {
 		return mDb.query(PN_DATABASE_TABLE_NAME, 
@@ -181,9 +193,9 @@ public class PNDbAdapter {
 	}
 	
 	/**
-	 * 
-	 * @param rowId
-	 * @return
+	 * Gets the note at the provided row id
+	 * @param rowId PNKEY_ROWID to match
+	 * @return Cursor for matching row in the database.  null otherwise.
 	 */
 	public Cursor getNote(long rowId) throws SQLException {
 		Cursor cursor =
@@ -193,11 +205,12 @@ public class PNDbAdapter {
 					PNKEY_ROWID + " = " + rowId,
 					null, null, null, null, null);
 		
+		boolean bSuccess = false;
 		if( cursor != null ) {
-			cursor.moveToFirst();
+			bSuccess = cursor.moveToFirst();
 		}
 		
-		return cursor;
+		return bSuccess ? cursor : null;
 	}
 	
 	////////////////////////////////////////////////////////////

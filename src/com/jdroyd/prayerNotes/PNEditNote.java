@@ -1,7 +1,9 @@
 package com.jdroyd.prayerNotes;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -42,9 +44,35 @@ public class PNEditNote extends Activity implements OnClickListener {
 			Bundle extras = getIntent().getExtras();
 			mDbRowId = (extras==null) ? null : extras.getLong(PNDbAdapter.PNKEY_ROWID);
 		}
+		Log.v("PN", "PNEditeNote activity started with mDbRowId = "+mDbRowId);
 		
-		//TODO: implement for already existing notes
-		//populateFields();
+		populateFields();
+	}
+	
+	/**
+	 * If a row id has been provided, gets the corresponding data from the
+	 * database and populates the corresponding fields in the View.
+	 */
+	private void populateFields() {
+		if( mDbRowId != null && mDbHelper != null) {
+			Cursor note = mDbHelper.getNote(mDbRowId);
+			if( note != null ) {
+				// Android method that takes care of Cursor life-cycle and resources
+				startManagingCursor(note);
+				
+				if( mNoteText != null ) {
+					mNoteText.setText( note.getString(
+							note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_NOTE_TEXT)) );
+					
+					// TODO: display field for image?
+					// TODO: display field for date created?
+					// TODO: display field for last prayed for?
+				}
+			}
+			else {
+				Log.w("PN", "No note found at row id: "+mDbRowId);
+			}
+		}
 	}
 
 	@Override
@@ -83,12 +111,14 @@ public class PNEditNote extends Activity implements OnClickListener {
 	}
 	
 	// Always called when the Activity ends
-    // We'll use this to save current note back to the DB
+    // TODO: save the current note back to the database?
 	@Override
 	protected void onPause() {
 		super.onPause();
 		// do we wanna do this?
 		//saveState();
+		
+		mDbHelper.close();
 	}
 
 	// Read note out of DB again and populate the fields
