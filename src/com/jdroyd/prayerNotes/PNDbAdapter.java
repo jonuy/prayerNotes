@@ -173,8 +173,7 @@ public class PNDbAdapter {
 		ContentValues newVal = new ContentValues();
 		newVal.put(PNKEY_NOTE_TEXT, noteText);
 		newVal.put(PNKEY_DATE_CREATED, dateCreated);
-		if( imgFilePath != null )
-			newVal.put(PNKEY_NOTE_IMG, imgFilePath);
+		newVal.put(PNKEY_NOTE_IMG, imgFilePath);
 		
 		return mDb.update(PN_DATABASE_TABLE_NAME, newVal, 
 				PNKEY_ROWID + " = " + rowId, null) > 0;

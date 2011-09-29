@@ -13,19 +13,21 @@ public final class R {
     public static final class drawable {
         public static final int icon=0x7f020000;
         public static final int img_gallery=0x7f020001;
+        public static final int img_remove_icon=0x7f020002;
     }
     public static final class id {
-        public static final int edit_note_discard=0x7f050004;
+        public static final int edit_note_discard=0x7f050005;
         public static final int edit_note_img=0x7f050000;
-        public static final int edit_note_save=0x7f050002;
-        public static final int edit_note_share=0x7f050003;
-        public static final int edit_note_text=0x7f050001;
-        public static final int main_button_add=0x7f050005;
-        public static final int main_note_row_created=0x7f050009;
-        public static final int main_note_row_created_text=0x7f050008;
-        public static final int main_note_row_img=0x7f050006;
-        public static final int main_note_row_status=0x7f05000a;
-        public static final int main_note_row_text=0x7f050007;
+        public static final int edit_note_img_remove=0x7f050001;
+        public static final int edit_note_save=0x7f050003;
+        public static final int edit_note_share=0x7f050004;
+        public static final int edit_note_text=0x7f050002;
+        public static final int main_button_add=0x7f050006;
+        public static final int main_note_row_created=0x7f05000a;
+        public static final int main_note_row_created_text=0x7f050009;
+        public static final int main_note_row_img=0x7f050007;
+        public static final int main_note_row_status=0x7f05000b;
+        public static final int main_note_row_text=0x7f050008;
     }
     public static final class layout {
         public static final int edit_note=0x7f030000;

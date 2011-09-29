@@ -30,6 +30,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private Button mShareButton;
 	private Button mDiscardButton;
 	private ImageView mImgView;
+	private ImageView mRemoveImgIcon;
 	
 	// Selected file path of image, if any
 	private String mImgFilePath;
@@ -50,11 +51,13 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mShareButton = (Button)findViewById(R.id.edit_note_share);
 		mDiscardButton = (Button)findViewById(R.id.edit_note_discard);
 		mImgView = (ImageView)findViewById(R.id.edit_note_img);
+		mRemoveImgIcon = (ImageView)findViewById(R.id.edit_note_img_remove);
 
 		mSaveButton.setOnClickListener(this);
 		mShareButton.setOnClickListener(this);
 		mDiscardButton.setOnClickListener(this);
 		mImgView.setOnClickListener(this);
+		mRemoveImgIcon.setOnClickListener(this);
 		
 		// Get row id of note being edited, if any
 		mDbRowId = (savedInstanceState == null) ? null :
@@ -123,6 +126,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 		case R.id.edit_note_img:
 			startGalleryActivity();
 			break;
+		case R.id.edit_note_img_remove:
+			removeNoteImage();
+			break;
 		}
 	}
 	
@@ -165,9 +171,7 @@ public class PNEditNote extends Activity implements OnClickListener {
     	switch( requestCode ) {
     	case ACTIVITY_IMG_GALLERY:
     		if(resultCode == RESULT_OK) {
-    			Log.v("PN", "IMG GALLERY Activity returned OK");
-    			
-				Uri selectedImage = intent.getData();
+    			Uri selectedImage = intent.getData();
 				String[] filePathColumn = {MediaStore.Images.Media.DATA};
 				
 				Cursor cursor = getContentResolver().query(selectedImage, 
@@ -177,29 +181,69 @@ public class PNEditNote extends Activity implements OnClickListener {
 				
 				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 				mImgFilePath = cursor.getString(columnIndex);
-				//cursor.close(); - hopefully shouldn't need to do this because of use of startManagingCursor?
 				
-				Log.v("PN", "img file path: "+mImgFilePath);
+				Log.v("PN", "Selected image file path: "+mImgFilePath);
 				
 				setNoteImageToView(mImgFilePath);
     		}
     		else {
-    			Log.v("PN", "IMG GALLERY Activity returned: "+resultCode);
+    			Log.w("PN", "ACTIVITY_IMG_GALLERY returned: "+resultCode);
     		}
     		break;
     	}
     }
 	
+	/**
+	 * Displays selected image, increases the ImageView size, and sets the remove
+	 * image icon to now be visible.
+	 * @param strFilePath file path to the image to display
+	 */
 	private void setNoteImageToView(String strFilePath) {
 		Bitmap selectedImg = BitmapFactory.decodeFile(strFilePath);
 		if( mImgView != null ) {
-			//TODO: adjust frame size smarter (*1.5 will just make it continue to get larger)
+			//TODO: place the values in a resource file instead of using magic numbers
+			float scale = getResources().getDisplayMetrics().density;
+			float newWidth = 120.f * scale;
+			float newHeight = 120.f * scale;
+
 			LayoutParams frame = mImgView.getLayoutParams();
-			frame.width = (int)(frame.width * 1.5);
-			frame.height = (int)(frame.height * 1.5);
+			frame.width = (int)newWidth;
+			frame.height = (int)newHeight;
 			mImgView.setLayoutParams(frame);
 			
 			mImgView.setImageBitmap(selectedImg);
+		}
+		
+		if( mRemoveImgIcon != null ) {
+			mRemoveImgIcon.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	/**
+	 * Removes note image from being displayed and nulls out file path that will
+	 * updated when state is saved
+	 */
+	private void removeNoteImage() {
+		// Null out file path.  WIll be saved to 
+		mImgFilePath = null;
+		
+		// Revert image display
+		if( mImgView != null ) {
+			mImgView.setImageResource(R.drawable.img_gallery);
+			
+			//TODO: place the values in a resource file instead of using magic numbers
+			float scale = getResources().getDisplayMetrics().density;
+			float newWidth = 80.f * scale;
+			float newHeight = 80.f * scale;
+			
+			LayoutParams frame = mImgView.getLayoutParams();
+			frame.width = (int)newWidth;
+			frame.height = (int)newHeight;
+			mImgView.setLayoutParams(frame);
+		}
+		
+		if( mRemoveImgIcon != null ) {
+			mRemoveImgIcon.setVisibility(View.INVISIBLE);
 		}
 	}
 	
