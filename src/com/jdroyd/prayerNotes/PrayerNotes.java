@@ -149,9 +149,8 @@ public class PrayerNotes extends ListActivity {
 	    			
 	    			HashMap<String,Object> noteHash = new HashMap<String,Object>();
 	    			
-	    			// IMPORTANT: row id also needs to be saved into hash so that
-	    			// when we select this item in onListItemClick, we have its 
-	    			// id to reference
+	    			// Row id also needs to be saved into hash so that when we
+	    			// select this item in onListItemClick, we have its id to reference
 	    			noteHash.put(PNDbAdapter.PNKEY_ROWID, noteId);
 	    			
 	    			// Get note text

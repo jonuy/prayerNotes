@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 public class PNEditNote extends Activity implements OnClickListener {
 
@@ -18,6 +20,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private Button mSaveButton;
 	private Button mShareButton;
 	private Button mDiscardButton;
+	private ImageView mImgView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +35,12 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mSaveButton = (Button)findViewById(R.id.edit_note_save);
 		mShareButton = (Button)findViewById(R.id.edit_note_share);
 		mDiscardButton = (Button)findViewById(R.id.edit_note_discard);
+		mImgView = (ImageView)findViewById(R.id.edit_note_img);
 
 		mSaveButton.setOnClickListener(this);
 		mShareButton.setOnClickListener(this);
 		mDiscardButton.setOnClickListener(this);
+		mImgView.setOnClickListener(this);
 		
 		// Get row id of note being edited, if any
 		mDbRowId = (savedInstanceState == null) ? null :
@@ -75,9 +80,12 @@ public class PNEditNote extends Activity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * onClick listener.  Handles behavior when UI elements are clicked
+	 */
 	@Override
-	public void onClick(View arg0) {
-		switch( arg0.getId() ) {
+	public void onClick(View v) {
+		switch( v.getId() ) {
 		case R.id.edit_note_save:
 			saveState();
 			setResult(RESULT_OK);
@@ -90,6 +98,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 		case R.id.edit_note_discard:
 			setResult(RESULT_OK);
 			finish();
+			break;
+		case R.id.edit_note_img:
+			Toast.makeText(v.getContext(),"ImageView clicked!",Toast.LENGTH_SHORT).show();
 			break;
 		}
 	}
