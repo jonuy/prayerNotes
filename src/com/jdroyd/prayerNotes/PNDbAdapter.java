@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+//TODO: make this a singleton too?
 public class PNDbAdapter {
 
 	// Database table name
@@ -93,7 +94,10 @@ public class PNDbAdapter {
 	 * 
 	 */
 	public PNDbAdapter open() throws SQLException {
-		mDbHelper = new PNDatabaseHelper(mContext);
+		Log.v("PNDbAdapter", "open()");
+		if( mDbHelper == null) {
+			mDbHelper = new PNDatabaseHelper(mContext);
+		}
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}
@@ -102,6 +106,7 @@ public class PNDbAdapter {
 	 * 
 	 */
 	public void close() {
+		Log.v("PNDbAdapter", "close()");
 		mDbHelper.close();
 	}
 	
@@ -152,19 +157,24 @@ public class PNDbAdapter {
 	
 	//TODO:  createNote() with all possible columns for params?
 	// isn't there a design pattern to handle this?  check Effective Java book.
-	public long createNote(String noteText, int dateCreated) {
+	public long createNote(String noteText, int dateCreated, String imgFilePath) {
 		ContentValues initVal = new ContentValues();
 		initVal.put(PNKEY_NOTE_TEXT, noteText);
 		initVal.put(PNKEY_DATE_CREATED, dateCreated);
+		if(imgFilePath != null)
+			initVal.put(PNKEY_NOTE_IMG, imgFilePath);
 		
 		return mDb.insert(PN_DATABASE_TABLE_NAME, null, initVal);
 	}
 
 	//TODO: updateNote() with all the other possible columns?
-	public boolean updateNote(long rowId, String noteText, int dateCreated) {
+	public boolean updateNote(long rowId, String noteText, int dateCreated,
+			String imgFilePath) {
 		ContentValues newVal = new ContentValues();
 		newVal.put(PNKEY_NOTE_TEXT, noteText);
 		newVal.put(PNKEY_DATE_CREATED, dateCreated);
+		if( imgFilePath != null )
+			newVal.put(PNKEY_NOTE_IMG, imgFilePath);
 		
 		return mDb.update(PN_DATABASE_TABLE_NAME, newVal, 
 				PNKEY_ROWID + " = " + rowId, null) > 0;
@@ -216,6 +226,7 @@ public class PNDbAdapter {
 	////////////////////////////////////////////////////////////
 	// PNDatabaseHelper
 	//   Custom database helper for creating and upgrading database
+	//   TODO: make this a singleton?
 	////////////////////////////////////////////////////////////
 	private static class PNDatabaseHelper extends SQLiteOpenHelper {
 		

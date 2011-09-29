@@ -9,12 +9,15 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -160,12 +163,11 @@ public class PrayerNotes extends ListActivity {
 	    			
 	    			// Get image data
 	    			if( noteImg != null ) {
-	    				;// TODO: how do we set the image?
+	    				noteHash.put(PNDbAdapter.PNKEY_NOTE_IMG, noteImg);
 	    			}
 	    			else {
 	    				noteHash.put(PNDbAdapter.PNKEY_NOTE_IMG, null);
 	    			}
-	    			//noteHash.put(PNDbAdapter.PNKEY_NOTE_IMG, R.drawable.icon);
 	    			
 	    			// Get date created
 	    			String strDateCreated = getResources().getText(R.string.unknown_date).toString();
@@ -221,8 +223,11 @@ public class PrayerNotes extends ListActivity {
 		public void setViewImage(ImageView v, int value) {
 			super.setViewImage(v, value);
 			
-			if(v.getId() == R.id.main_note_row_img && value > 0) {
-				v.setVisibility(View.VISIBLE);
+			if(v.getId() == R.id.main_note_row_img) {
+				if( value > 0 )
+					v.setVisibility(View.VISIBLE);
+				else
+					v.setVisibility(View.GONE);
 			}
 		}
 		
@@ -232,16 +237,26 @@ public class PrayerNotes extends ListActivity {
 			// super tries to evaluate it as a file path and throws errors
 			if( value != "" ) {
 				super.setViewImage(v, value);
+				Log.v("PN", "setting view image: "+value);
+				
+				//Is this way faster than super.setViewImage()?
+				//Bitmap img = BitmapFactory.decodeFile(value);
+				//v.setImageBitmap(img);
+				
+				if(v.getId() == R.id.main_note_row_img) {
+					v.setVisibility(View.VISIBLE);
+				}
+			}
+			else {
+				if(v.getId() == R.id.main_note_row_img) {
+					v.setVisibility(View.GONE);
+				}
 			}
 		}
 
 		@Override
 		public void setViewText(TextView v, String text) {
 			super.setViewText(v, text);
-			
-			if(v.getId() == R.id.main_note_row_img && text != null) {
-				v.setVisibility(View.VISIBLE);
-			}
 		}    	
     }
     

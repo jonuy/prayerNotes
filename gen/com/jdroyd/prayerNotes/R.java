@@ -34,6 +34,7 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f040000;
+        public static final int coming_soon=0x7f04000e;
         public static final int context_menu_delete=0x7f04000d;
         public static final int date_created=0x7f040001;
         public static final int edit_delete_button=0x7f040007;
