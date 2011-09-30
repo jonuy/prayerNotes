@@ -40,6 +40,24 @@
 		android:minLines="4"
 		android:gravity="top"
 		android:textSize="10dp"/>
+	
+	<!-- CheckBox and accompanying TextView are visibility=gone by default.
+		 These elements will only be visible when editing an already existing 
+		 note. -->
+	<CheckBox android:id="@+id/edit_note_prayedFor"
+		android:text="@string/checkbox_prayed_for_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingTop="20dp"
+		android:textSize="12sp"
+		android:visibility="gone"/>
+	<TextView android:id="@+id/edit_note_prayedFor_status"
+		android:text="@string/last_prayed_for"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="10sp"
+		android:paddingBottom="20dp"
+		android:visibility="gone"/>
 		
 	<LinearLayout
 		android:orientation="horizontal"

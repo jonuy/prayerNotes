@@ -173,14 +173,14 @@ public class PrayerNotes extends ListActivity {
 	    			}
 	    			
 	    			// Get date created
-	    			String strDateCreated = getResources().getText(R.string.unknown_date).toString();
+	    			String strDateCreated = getResources().getText(R.string.date_unknown).toString();
 	    			if( dateCreated > 0 ) {
 	    				strDateCreated = mDbAdapter.convertDbDateToString(dateCreated);
 	    			}
 	    			noteHash.put(PNDbAdapter.PNKEY_DATE_CREATED, strDateCreated);
 	    			
 	    			// Get LastPrayed data
-	    			String strLastPrayed = getResources().getText(R.string.unknown_date).toString();
+	    			String strLastPrayed = getResources().getText(R.string.date_never).toString();
 	    			if( lastPrayed > 0 ) {
 	    				strLastPrayed = mDbAdapter.convertDbDateToString(lastPrayed);
 	    			}

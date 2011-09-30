@@ -16,8 +16,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class PNEditNote extends Activity implements OnClickListener {
@@ -30,16 +32,21 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private EditText mNoteText;
 	private Long mDbRowId;
 	
+	// Handles to UI elements
 	private Button mSaveButton;
 	private Button mShareButton;
 	private Button mDiscardButton;
 	private ImageView mImgView;
 	private ImageView mRemoveImgIcon;
+	private CheckBox mPrayedForCheckBox;
+	private TextView mPrayedForStatus;
 	
 	// Selected file path of image, if any
 	private String mImgFilePath;
-	// Stored date note was created, if applicable
+	// Stored date note was created
 	private int mDateCreated;
+	// Stored date note was last prayed
+	private int mDatePrayed;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +63,15 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mDiscardButton = (Button)findViewById(R.id.edit_note_discard);
 		mImgView = (ImageView)findViewById(R.id.edit_note_img);
 		mRemoveImgIcon = (ImageView)findViewById(R.id.edit_note_img_remove);
+		mPrayedForCheckBox = (CheckBox)findViewById(R.id.edit_note_prayedFor);
+		mPrayedForStatus = (TextView)findViewById(R.id.edit_note_prayedFor_status);
 
 		mSaveButton.setOnClickListener(this);
 		mShareButton.setOnClickListener(this);
 		mDiscardButton.setOnClickListener(this);
 		mImgView.setOnClickListener(this);
 		mRemoveImgIcon.setOnClickListener(this);
+		mPrayedForCheckBox.setOnClickListener(this);
 		
 		// Get row id of note being edited, if any
 		mDbRowId = (savedInstanceState == null) ? null :
@@ -71,15 +81,36 @@ public class PNEditNote extends Activity implements OnClickListener {
 			mDbRowId = (extras==null) ? null : extras.getLong(PNDbAdapter.PNKEY_ROWID);
 		}
 		
-		if( mDiscardButton != null ) {
-			// If it's a new note, button is to discard
-			if( isNewNote() )
+		// Setup initial UI for the Activity, handling special cases
+		initUI();
+	}
+	
+	/**
+	 * Configure initial UI depending on if we're creating a new note or not
+	 */
+	private void initUI() {
+		if( isNewNote() ) {
+			// Discard button text is "Discard"
+			if( mDiscardButton != null ) {
 				mDiscardButton.setText(R.string.edit_discard_button);
-			// If editing already existing note, button is to delete
-			else
+			}
+		}
+		else {
+			// Make checkbox elements visible if not a new note
+			if( mPrayedForCheckBox != null ) {
+				mPrayedForCheckBox.setVisibility(View.VISIBLE);
+			}
+			if( mPrayedForStatus != null ) {
+				mPrayedForStatus.setVisibility(View.VISIBLE);
+			}
+			
+			// Discard button text is "Delete"
+			if( mDiscardButton != null ) {
 				mDiscardButton.setText(R.string.edit_delete_button);
+			}
 		}
 		
+		// If applicable, will fill out UI with the saved note data
 		populateFields();
 	}
 	
@@ -103,21 +134,52 @@ public class PNEditNote extends Activity implements OnClickListener {
 				// Android method that takes care of Cursor life-cycle and resources
 				startManagingCursor(note);
 				
+				// Note's text
 				if( mNoteText != null ) {
 					mNoteText.setText( note.getString(
 							note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_NOTE_TEXT)) );
 				}
 				
-				mDateCreated = note.getInt(
-						note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_DATE_CREATED));
 				
+				
+				// Attached image
 				mImgFilePath = note.getString(
 						note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_NOTE_IMG));
 				if( mImgFilePath != null ) {
 					setNoteImageToView(mImgFilePath);
 				}
+				
+				// Date last prayed
+				mDatePrayed = note.getInt(
+						note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_LAST_PRAYED));
+				if( mDatePrayed > 0 ) {
+					if( mPrayedForCheckBox != null ) {
+						mPrayedForCheckBox.setChecked(true);
+					}
+					if( mPrayedForStatus != null && mDbAdapter != null ) {
+						String prayedStatus = 
+							getResources().getText(R.string.last_prayed_for).toString()
+							+ " " + mDbAdapter.convertDbDateToString(mDatePrayed);
+						mPrayedForStatus.setText(prayedStatus);
+					}
+				}
+				else {
+					if( mPrayedForCheckBox != null ) {
+						mPrayedForCheckBox.setChecked(false);
+					}
+					if( mPrayedForStatus != null ) {
+						String prayedStatus = 
+							getResources().getText(R.string.last_prayed_for).toString()
+							+" "+ getResources().getText(R.string.date_never).toString();
+						mPrayedForStatus.setText(prayedStatus);
+					}
+				}
+				
+				// Date created
+				mDateCreated = note.getInt(
+						note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_DATE_CREATED));
+				
 				// TODO: display field for date created?
-				// TODO: display field for last prayed for?
 			}
 			else {
 				Log.w("PN", "No note found at row id: "+mDbRowId);
@@ -155,6 +217,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 		case R.id.edit_note_img_remove:
 			removeNoteImage();
 			break;
+		case R.id.edit_note_prayedFor:
+			onNoteIsPrayedFor( ((CheckBox)v).isChecked() );
+			break;
 		}
 	}
 	
@@ -174,7 +239,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 				mDbRowId = id;
 		}
 		else {
-			mDbAdapter.updateNote(mDbRowId, noteText, mDateCreated, mImgFilePath);
+			mDbAdapter.updateNote(mDbRowId, noteText, mImgFilePath, mDatePrayed);
 		}
 	}
 	
@@ -242,6 +307,33 @@ public class PNEditNote extends Activity implements OnClickListener {
 		
 		if( mRemoveImgIcon != null ) {
 			mRemoveImgIcon.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	/**
+	 * Called when checkbox is toggled on or off
+	 * @param bIsChecked
+	 */
+	private void onNoteIsPrayedFor(boolean bIsChecked) {
+		if( bIsChecked ) {
+			// Get current time to be saved to database
+			if( mDbAdapter != null )
+				mDatePrayed = mDbAdapter.getCurrentDateForDb();
+			
+			// Display this time to screen
+			if( mPrayedForStatus != null )
+				mPrayedForStatus.setText(
+						getResources().getText(R.string.last_prayed_for).toString()
+						+ mDbAdapter.convertDbDateToString(mDatePrayed));
+		}
+		else {
+			// Reset info if checkbox is unchecked
+			mDatePrayed = 0;
+			
+			if( mPrayedForStatus != null )
+				mPrayedForStatus.setText(
+					getResources().getText(R.string.last_prayed_for).toString()
+					+ getResources().getText(R.string.date_never).toString());
 		}
 	}
 	

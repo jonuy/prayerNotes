@@ -168,12 +168,13 @@ public class PNDbAdapter {
 	}
 
 	//TODO: updateNote() with all the other possible columns?
-	public boolean updateNote(long rowId, String noteText, int dateCreated,
-			String imgFilePath) {
+	public boolean updateNote(long rowId, String noteText, String imgFilePath, 
+			int dateLastPrayed) {
 		ContentValues newVal = new ContentValues();
 		newVal.put(PNKEY_NOTE_TEXT, noteText);
-		newVal.put(PNKEY_DATE_CREATED, dateCreated);
+		//newVal.put(PNKEY_DATE_CREATED, dateCreated);
 		newVal.put(PNKEY_NOTE_IMG, imgFilePath);
+		newVal.put(PNKEY_LAST_PRAYED, dateLastPrayed);
 		
 		return mDb.update(PN_DATABASE_TABLE_NAME, newVal, 
 				PNKEY_ROWID + " = " + rowId, null) > 0;
