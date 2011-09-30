@@ -39,6 +39,9 @@ public final class R {
         public static final int coming_soon=0x7f04000e;
         public static final int context_menu_delete=0x7f04000d;
         public static final int date_created=0x7f040001;
+        public static final int dialog_delete_confirm=0x7f04000f;
+        public static final int dialog_no=0x7f040011;
+        public static final int dialog_yes=0x7f040010;
         public static final int edit_delete_button=0x7f040007;
         public static final int edit_discard_button=0x7f040006;
         public static final int edit_note_img_title=0x7f04000a;

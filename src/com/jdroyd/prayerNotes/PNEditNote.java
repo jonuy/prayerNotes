@@ -1,6 +1,9 @@
 package com.jdroyd.prayerNotes;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -21,6 +24,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 
 	//TODO: move to file with all the constants?
 	public static final int ACTIVITY_IMG_GALLERY = 3;
+	private static final int DIALOG_DELETE_NOTE = 0;
 	
 	private PNDbAdapter mDbAdapter;
 	private EditText mNoteText;
@@ -66,9 +70,26 @@ public class PNEditNote extends Activity implements OnClickListener {
 			Bundle extras = getIntent().getExtras();
 			mDbRowId = (extras==null) ? null : extras.getLong(PNDbAdapter.PNKEY_ROWID);
 		}
-		Log.v("PN", "PNEditeNote activity started with mDbRowId = "+mDbRowId);
+		
+		if( mDiscardButton != null ) {
+			// If it's a new note, button is to discard
+			if( isNewNote() )
+				mDiscardButton.setText(R.string.edit_discard_button);
+			// If editing already existing note, button is to delete
+			else
+				mDiscardButton.setText(R.string.edit_delete_button);
+		}
 		
 		populateFields();
+	}
+	
+	/**
+	 * Helper to determine whether or not user is editing an already existing 
+	 * note or creating a new one.
+	 * @return true if note is new, false if editing already existing one
+	 */
+	private boolean isNewNote() {
+		return (mDbRowId == null) ? true : false;
 	}
 	
 	/**
@@ -120,8 +141,13 @@ public class PNEditNote extends Activity implements OnClickListener {
 			Toast.makeText(v.getContext(), R.string.coming_soon, Toast.LENGTH_SHORT).show();
 			break;
 		case R.id.edit_note_discard:
-			setResult(RESULT_OK);
-			finish();
+			if( isNewNote() ) {
+				setResult(RESULT_OK);
+				finish();
+			}
+			else {
+				showDialog(DIALOG_DELETE_NOTE);
+			}
 			break;
 		case R.id.edit_note_img:
 			startGalleryActivity();
@@ -245,6 +271,52 @@ public class PNEditNote extends Activity implements OnClickListener {
 		if( mRemoveImgIcon != null ) {
 			mRemoveImgIcon.setVisibility(View.INVISIBLE);
 		}
+	}
+	
+	/**
+	 * Create dialog box prompting user to confirm delete action.
+	 * showDialog() will take care to display it.
+	 */
+	private AlertDialog createDeleteDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.dialog_delete_confirm)
+			.setCancelable(false)
+			.setPositiveButton(R.string.dialog_yes,	new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// Delete note from database
+					if( mDbAdapter != null && mDbRowId != null ) {
+						mDbAdapter.deleteNote(mDbRowId);
+					}
+					
+					// Exit the Activity
+					setResult(RESULT_OK);
+					finish();
+				}
+			})
+			.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// Dismiss dialog with no changes made
+					dialog.cancel();
+				}
+			});
+		
+		AlertDialog alert = builder.create();
+		return alert;
+	}
+	
+	/**
+	 * Called first time showDialog() is called for a given id
+	 */
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch(id) {
+		case DIALOG_DELETE_NOTE:
+			return createDeleteDialog();
+		}
+
+		return super.onCreateDialog(id);
 	}
 	
 	// Always called when the Activity ends

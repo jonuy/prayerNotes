@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -27,10 +30,16 @@ public class PrayerNotes extends ListActivity {
 	//TODO: make this an enum?  place in constants file?
 	public static final int ACTIVITY_CREATE = 0;
 	public static final int ACTIVITY_EDIT = 1;
+	
 	public static final int CONTEXT_DELETE_ID = 0;
+	
+	private static final int DIALOG_DELETE_NOTE = 0;
 	
 	//
 	private PNDbAdapter mDbAdapter;
+	
+	// Row id of note to delete
+	private Long mRowIdToDelete;
 	
     /** 
      * Called when the activity is first created.
@@ -41,14 +50,15 @@ public class PrayerNotes extends ListActivity {
         setContentView(R.layout.main_list);
         //setTitle(R.string.app_name)
         
-        // DEV DELETE DATABASE
+        ////// DEV DELETE DATABASE //////
         //boolean deleteResult = this.deleteDatabase(PNDbAdapter.PN_DATABASE_FILE_NAME);
         //Log.v("PN", "Database delete result: "+deleteResult);
-        //////////////////////
+        /////////////////////////////////
         
         mDbAdapter = new PNDbAdapter(this);
         mDbAdapter.open();
         
+        // Display any existing data to the ListView
         populateList();
         
         // Setup click listener for the Add button
@@ -71,8 +81,6 @@ public class PrayerNotes extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 		
 		long rowId = getRowIdFromListAtPosition(position);
-		Log.v("PN", "onListItemClick() rowId: "+rowId);
-		
 		editPrayerNote(rowId);
 	}
     
@@ -141,11 +149,9 @@ public class PrayerNotes extends ListActivity {
 	    					notesCursor.getColumnIndexOrThrow(PNDbAdapter.PNKEY_LAST_PRAYED) );
 	    			
 	    			int pos = notesCursor.getPosition();
-	    			Log.v("POP", pos+": noteId = "+noteId);
-	    			Log.v("POP", pos+": noteText = "+noteText);
-	    			Log.v("POP", pos+": noteImg = "+noteImg);
-	    			Log.v("POP", pos+": dateCreated = "+dateCreated);
-	    			Log.v("POP", pos+": lastPrayed = "+lastPrayed);
+	    			Log.v("populateList()", pos+": noteId="+noteId+" / noteText:"
+	    					+noteText+" / noteImg:"+noteImg+" / dateCreated:"
+	    					+dateCreated+" / lastPrayed:"+lastPrayed);
 	    			
 	    			HashMap<String,Object> noteHash = new HashMap<String,Object>();
 	    			
@@ -205,9 +211,10 @@ public class PrayerNotes extends ListActivity {
     	lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     }
 
-	/**
-     * 
-     */
+	////////////////////////////////////////////////////////////////////////////
+    // PNViewAdapter
+    //   Custom adapter used to display the info in the main ListView
+    ////////////////////////////////////////////////////////////////////////////
     private class PNViewAdapter extends SimpleAdapter {
 
 		public PNViewAdapter(Context context,
@@ -234,8 +241,6 @@ public class PrayerNotes extends ListActivity {
 			// super tries to evaluate it as a file path and throws errors
 			if( value != "" ) {
 				super.setViewImage(v, value);
-				Log.v("PN", "setting view image: "+value);
-				
 				//Is this way faster than super.setViewImage()?
 				//Bitmap img = BitmapFactory.decodeFile(value);
 				//v.setImageBitmap(img);
@@ -257,10 +262,9 @@ public class PrayerNotes extends ListActivity {
 		}    	
     }
     
-    /**
-     * Context menu function overrides
-     */
-    
+    ////////////////////////////////////////////////////////////////////////////
+    // Context menu function overrides
+    ////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
     		ContextMenuInfo menuInfo) {
@@ -275,8 +279,8 @@ public class PrayerNotes extends ListActivity {
     	case CONTEXT_DELETE_ID:
     		AdapterContextMenuInfo info = (AdapterContextMenuInfo)item.getMenuInfo();
     		if( info != null ) {
-	    		mDbAdapter.deleteNote(getRowIdFromListAtPosition(info.position));
-	    		populateList();
+    			mRowIdToDelete = getRowIdFromListAtPosition(info.position);
+	    		showDialog(DIALOG_DELETE_NOTE);
     		}
     		
     		return true;
@@ -284,4 +288,52 @@ public class PrayerNotes extends ListActivity {
     	
     	return super.onContextItemSelected(item);
     }
+    
+    
+    
+    /**
+     * Creates dialog box prompting user to confirm delete action
+     */
+    private AlertDialog createDeleteDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.dialog_delete_confirm)
+			.setCancelable(false)
+			.setPositiveButton(R.string.dialog_yes,	new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// Delete note from database
+					if( mDbAdapter != null && mRowIdToDelete != null ) {
+						if( mDbAdapter.deleteNote(mRowIdToDelete) ) {
+							// Reset value if row was successfully deleted
+							mRowIdToDelete = null;
+							// Repopulate list since row's been deleted
+							populateList();
+						}
+					}
+				}
+			})
+			.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// Dismiss dialog with no changes made
+					dialog.cancel();
+				}
+			});
+		
+		AlertDialog alert = builder.create();
+		return alert;
+	}
+
+    /**
+	 * Called first time showDialog() is called for a given id
+	 */
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch(id) {
+		case DIALOG_DELETE_NOTE:
+			return createDeleteDialog();
+		}
+
+		return super.onCreateDialog(id);
+	}
 }

@@ -15,4 +15,7 @@
     <string name="unknown_date">Unknown</string>
     <string name="context_menu_delete">Delete prayerNote</string>
     <string name="coming_soon">Coming Soon!</string>
+    <string name="dialog_delete_confirm">Are you sure you want to delete this prayerNote?</string>
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
 </resources>
