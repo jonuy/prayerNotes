@@ -2,25 +2,26 @@
 <resources>
     <string name="app_name">prayerNotes</string>
     
-    <string name="last_prayed_for">Last prayed for:\u0020</string><string name="date_created">Date Created:\u0020</string>
-    <string name="date_unknown">Unknown</string><string name="date_never">Never</string><string name="new_note_title">Create a prayerNote</string>
-    <string name="main_list_empty">No prayerNotes saved.  Create a new one!</string><string name="edit_note_title">Edit a prayerNote</string>
+    <string name="last_prayed_for">Last prayed for:\u0020</string>
+    <string name="date_created">Date Created:\u0020</string>
+    <string name="date_unknown">Unknown</string>
+    <string name="date_never">Never</string>
+    <string name="new_note_title">Create a prayerNote</string>
+    <string name="main_list_empty">No prayerNotes saved.  Create a new one!</string>
+    <string name="edit_note_title">Edit a prayerNote</string>
     <string name="edit_save_button">Save</string>
     <string name="edit_discard_button">Discard</string>
     <string name="edit_delete_button">Delete</string>
     <string name="edit_share_button">Save/Share</string>
     <string name="edit_note_text_title">Edit prayerNote:</string>
     <string name="edit_note_img_title">Attach an image:</string>
-    
-    
     <string name="context_menu_delete">Delete</string>
-    <string name="context_menu_prayed">Mark as prayed for</string><string name="context_prayed_success">prayerNote prayed for!</string><string name="coming_soon">Coming Soon!</string>
+    <string name="context_menu_prayed">Mark as prayed for</string>
+    <string name="context_prayed_success">prayerNote prayed for!</string>
+    <string name="coming_soon">Coming Soon!</string>
     <string name="dialog_delete_confirm">Are you sure you want to delete this prayerNote?</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
     <string name="checkbox_prayed_for_text">Mark as prayed for</string>
-    
-    
-    
     <string name="checkbox_prayed_success_text">prayerNote prayed for!</string>
 </resources>

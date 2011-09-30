@@ -294,7 +294,7 @@ public class PrayerNotes extends ListActivity {
 		    		// Get current time and save to database
 		    		mDbAdapter.updateNote(rowId, mDbAdapter.getCurrentDateForDb());
 		    		// Display Toast acknowledgment
-		    		Toast.makeText(this, R.string.context_prayed_success, Toast.LENGTH_SHORT)
+		    		Toast.makeText(this, R.string.context_prayed_success, Toast.LENGTH_LONG)
 		    			 .show();
 		    		// refresh ListView
 		    		populateList();

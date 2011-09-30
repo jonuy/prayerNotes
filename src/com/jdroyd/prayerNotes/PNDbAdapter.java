@@ -16,7 +16,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-//TODO: make this a singleton too?
 public class PNDbAdapter {
 
 	// Database table name

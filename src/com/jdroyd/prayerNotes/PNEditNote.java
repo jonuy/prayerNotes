@@ -79,7 +79,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 		if( mDbRowId == null ) {
 			Bundle extras = getIntent().getExtras();
 			mDbRowId = (extras==null) ? null : extras.getLong(PNDbAdapter.PNKEY_ROWID);
+			Log.v("SAVE", "row id from Intent:"+mDbRowId);
 		}
+		else
+			Log.v("SAVE", "row id from Bundle:"+mDbRowId);
 		
 		// Setup initial UI for the Activity, handling special cases
 		initUI();
@@ -437,12 +440,15 @@ public class PNEditNote extends Activity implements OnClickListener {
 		//populateFields();
 	}
 
-	// called when Activity is being stopped
+	/**
+	 *  Called when Activity is being stopped and put in background state
+	 *  @param outState Bundle that can be used to save any dynamic instance state
+	 *         Can be retrieved when Activity is started again in onCreate()
+	 */
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		// outState here is the the same savedInstanceState we get in onCreate()
 		super.onSaveInstanceState(outState);
-		//saveState();
-		//outState.putSerializable(NotesDbAdapter.KEY_ROWID, mRowId);
+		Log.v("SAVE", "onSaveInstanceState - mDbRowId="+mDbRowId);
+		outState.putSerializable(PNDbAdapter.PNKEY_ROWID, mDbRowId);
 	}
 }
