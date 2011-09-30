@@ -167,13 +167,24 @@ public class PNDbAdapter {
 		return mDb.insert(PN_DATABASE_TABLE_NAME, null, initVal);
 	}
 
-	//TODO: updateNote() with all the other possible columns?
+	// Updates the note in the database for all columns except date created
 	public boolean updateNote(long rowId, String noteText, String imgFilePath, 
 			int dateLastPrayed) {
+		// Not allowing for the date created to be updated
 		ContentValues newVal = new ContentValues();
 		newVal.put(PNKEY_NOTE_TEXT, noteText);
-		//newVal.put(PNKEY_DATE_CREATED, dateCreated);
 		newVal.put(PNKEY_NOTE_IMG, imgFilePath);
+		newVal.put(PNKEY_LAST_PRAYED, dateLastPrayed);
+		
+		return mDb.update(PN_DATABASE_TABLE_NAME, newVal, 
+				PNKEY_ROWID + " = " + rowId, null) > 0;
+	}
+	
+	/**
+	 * Updates the note in the database for the dateLastPrayed column
+	 */
+	public boolean updateNote(long rowId, int dateLastPrayed) {
+		ContentValues newVal = new ContentValues();
 		newVal.put(PNKEY_LAST_PRAYED, dateLastPrayed);
 		
 		return mDb.update(PN_DATABASE_TABLE_NAME, newVal, 

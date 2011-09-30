@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class PrayerNotes extends ListActivity {
@@ -32,6 +33,7 @@ public class PrayerNotes extends ListActivity {
 	public static final int ACTIVITY_EDIT = 1;
 	
 	public static final int CONTEXT_DELETE_ID = 0;
+	public static final int CONTEXT_PRAYED_ID = 1;
 	
 	private static final int DIALOG_DELETE_NOTE = 0;
 	
@@ -269,27 +271,40 @@ public class PrayerNotes extends ListActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,
     		ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
+    	menu.add(0, CONTEXT_PRAYED_ID, 0, R.string.context_menu_prayed);
     	menu.add(0, CONTEXT_DELETE_ID, 0, R.string.context_menu_delete);
     }
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+    	Long rowId = null;
+    	AdapterContextMenuInfo info = (AdapterContextMenuInfo)item.getMenuInfo();
+    	if( info != null )
+    		rowId = getRowIdFromListAtPosition(info.position);
     	
-    	switch(item.getItemId()) {
-    	case CONTEXT_DELETE_ID:
-    		AdapterContextMenuInfo info = (AdapterContextMenuInfo)item.getMenuInfo();
-    		if( info != null ) {
-    			mRowIdToDelete = getRowIdFromListAtPosition(info.position);
+    	if( rowId != null ) {
+	    	switch(item.getItemId()) {
+	    	case CONTEXT_DELETE_ID:
+	    		// Set row id for dialog to delete
+				mRowIdToDelete = rowId;
 	    		showDialog(DIALOG_DELETE_NOTE);
-    		}
-    		
-    		return true;
+	    		return true;
+	    	case CONTEXT_PRAYED_ID:
+	    		if( mDbAdapter != null ) {
+		    		// Get current time and save to database
+		    		mDbAdapter.updateNote(rowId, mDbAdapter.getCurrentDateForDb());
+		    		// Display Toast acknowledgment
+		    		Toast.makeText(this, R.string.context_prayed_success, Toast.LENGTH_SHORT)
+		    			 .show();
+		    		// refresh ListView
+		    		populateList();
+	    		}
+	    		return true;
+	    	}
     	}
     	
     	return super.onContextItemSelected(item);
     }
-    
-    
     
     /**
      * Creates dialog box prompting user to confirm delete action

@@ -140,8 +140,6 @@ public class PNEditNote extends Activity implements OnClickListener {
 							note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_NOTE_TEXT)) );
 				}
 				
-				
-				
 				// Attached image
 				mImgFilePath = note.getString(
 						note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_NOTE_IMG));
@@ -155,6 +153,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 				if( mDatePrayed > 0 ) {
 					if( mPrayedForCheckBox != null ) {
 						mPrayedForCheckBox.setChecked(true);
+						mPrayedForCheckBox.setText(R.string.checkbox_prayed_success_text);
 					}
 					if( mPrayedForStatus != null && mDbAdapter != null ) {
 						String prayedStatus = 
@@ -166,6 +165,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 				else {
 					if( mPrayedForCheckBox != null ) {
 						mPrayedForCheckBox.setChecked(false);
+						mPrayedForCheckBox.setText(R.string.checkbox_prayed_for_text);
 					}
 					if( mPrayedForStatus != null ) {
 						String prayedStatus = 
@@ -325,6 +325,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 				mPrayedForStatus.setText(
 						getResources().getText(R.string.last_prayed_for).toString()
 						+ mDbAdapter.convertDbDateToString(mDatePrayed));
+			
+			// Change text for checkbox
+			if( mPrayedForCheckBox != null )
+				mPrayedForCheckBox.setText(R.string.checkbox_prayed_success_text);
 		}
 		else {
 			// Reset info if checkbox is unchecked
@@ -334,6 +338,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 				mPrayedForStatus.setText(
 					getResources().getText(R.string.last_prayed_for).toString()
 					+ getResources().getText(R.string.date_never).toString());
+			
+			if( mPrayedForCheckBox != null )
+				mPrayedForCheckBox.setText(R.string.checkbox_prayed_for_text);
 		}
 	}
 	
