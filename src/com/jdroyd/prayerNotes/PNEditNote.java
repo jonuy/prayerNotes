@@ -1,10 +1,13 @@
 package com.jdroyd.prayerNotes;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,13 +23,15 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class PNEditNote extends Activity implements OnClickListener {
 
 	//TODO: move to file with all the constants?
 	public static final int ACTIVITY_IMG_GALLERY = 3;
+	public static final int ACTIVITY_EMAIL_SHARE = 4;
+	public static final int ACTIVITY_GMAIL_SHARE = 5;
 	private static final int DIALOG_DELETE_NOTE = 0;
+	private static final int DIALOG_SHARE_NOTE = 1;
 	
 	private PNDbAdapter mDbAdapter;
 	private EditText mNoteText;
@@ -202,8 +207,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 			finish();
 			break;
 		case R.id.edit_note_share:
-			setResult(RESULT_OK);
-			Toast.makeText(v.getContext(), R.string.coming_soon, Toast.LENGTH_SHORT).show();
+			showDialog(DIALOG_SHARE_NOTE);
 			break;
 		case R.id.edit_note_discard:
 			if( isNewNote() ) {
@@ -256,6 +260,51 @@ public class PNEditNote extends Activity implements OnClickListener {
 	}
 	
 	/**
+	 * Method to ensure Activities exist before they get added to the share list
+	 */
+	private CharSequence[] getAvailableShareActivities() {
+		ArrayList<String> strItems = new ArrayList<String>();
+		
+		// Email Intent
+		if( PNShareIntentsHandler.getInstance()
+						   .isActivityAvailable(this, PNShareIntentsHandler.PNIntent.EMAIL) ) {
+			strItems.add(getResources().getText(R.string.dialog_list_email).toString());
+		}
+		
+		// Gmail Intent
+		if( PNShareIntentsHandler.getInstance()
+						   .isActivityAvailable(this, PNShareIntentsHandler.PNIntent.GMAIL) ) {
+			strItems.add(getResources().getText(R.string.dialog_list_gmail).toString());
+		}
+		
+		int numItems = strItems.size();
+		CharSequence[] items = new String[numItems];
+		for( int i=0; i<numItems; i++ ) {
+			items[i] = strItems.get(i);
+		}
+		
+		return items;
+	}
+	
+	/**
+	 * Starts email share Activity
+	 */
+	private void startEmailShareActivity() {
+		Intent emailIntent = PNShareIntentsHandler.getInstance().getIntent(PNShareIntentsHandler.PNIntent.EMAIL);
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "This is the subject");
+        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "This is the text");
+        startActivityForResult(emailIntent, ACTIVITY_EMAIL_SHARE);
+	}
+	
+	/**
+	 * Starts Gmail share Activity
+	 */
+	private void startGmailShareActivity() {
+		Intent gmailIntent = PNShareIntentsHandler.getInstance().getIntent(PNShareIntentsHandler.PNIntent.GMAIL);
+		startActivityForResult(gmailIntent, ACTIVITY_GMAIL_SHARE);
+	}
+	
+	/**
 	 * Handles the results of Activities launched from this class
 	 */
 	@Override
@@ -284,6 +333,16 @@ public class PNEditNote extends Activity implements OnClickListener {
     			Log.w("PN", "ACTIVITY_IMG_GALLERY returned: "+resultCode);
     		}
     		break;
+    	case ACTIVITY_EMAIL_SHARE:
+    		if( resultCode == RESULT_OK)
+    			Log.v("PN", "email share activity OK");
+    		else
+    			Log.v("PN", "email share not ok: "+resultCode);
+    	case ACTIVITY_GMAIL_SHARE:
+    		if( resultCode == RESULT_OK)
+    			Log.v("PN", "Gmail share activity OK");
+    		else
+    			Log.v("PN", "Gmail share not ok: "+resultCode);
     	}
     }
 	
@@ -409,6 +468,35 @@ public class PNEditNote extends Activity implements OnClickListener {
 	}
 	
 	/**
+	 * Create dialog box with list of options for user to share the note
+	 */
+	private AlertDialog createShareDialog() {
+		// Determine if Activity is available before 
+		// List of share options
+		final CharSequence[] items = getAvailableShareActivities();
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.dialog_share_title);
+		builder.setItems(items, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int item) {
+				Log.v("SHARE", "clicked item:"+item);
+				switch(item) {
+				case 0:
+					startEmailShareActivity();
+					break;
+				case 1:
+					startGmailShareActivity();
+					break;
+				}
+			}
+		});
+		
+		AlertDialog alert = builder.create();
+		return alert;
+	}
+	
+	/**
 	 * Called first time showDialog() is called for a given id
 	 */
 	@Override
@@ -416,6 +504,8 @@ public class PNEditNote extends Activity implements OnClickListener {
 		switch(id) {
 		case DIALOG_DELETE_NOTE:
 			return createDeleteDialog();
+		case DIALOG_SHARE_NOTE:
+			return createShareDialog();
 		}
 
 		return super.onCreateDialog(id);
@@ -452,3 +542,4 @@ public class PNEditNote extends Activity implements OnClickListener {
 		outState.putSerializable(PNDbAdapter.PNKEY_ROWID, mDbRowId);
 	}
 }
+

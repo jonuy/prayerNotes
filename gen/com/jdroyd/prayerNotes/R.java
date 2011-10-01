@@ -38,8 +38,8 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f040000;
-        public static final int checkbox_prayed_for_text=0x7f040015;
-        public static final int checkbox_prayed_success_text=0x7f040016;
+        public static final int checkbox_prayed_for_text=0x7f040016;
+        public static final int checkbox_prayed_success_text=0x7f040017;
         public static final int coming_soon=0x7f040011;
         public static final int context_menu_delete=0x7f04000e;
         public static final int context_menu_prayed=0x7f04000f;
@@ -48,7 +48,10 @@ public final class R {
         public static final int date_never=0x7f040004;
         public static final int date_unknown=0x7f040003;
         public static final int dialog_delete_confirm=0x7f040012;
+        public static final int dialog_list_email=0x7f040018;
+        public static final int dialog_list_gmail=0x7f040019;
         public static final int dialog_no=0x7f040014;
+        public static final int dialog_share_title=0x7f040015;
         public static final int dialog_yes=0x7f040013;
         public static final int edit_delete_button=0x7f04000a;
         public static final int edit_discard_button=0x7f040009;
