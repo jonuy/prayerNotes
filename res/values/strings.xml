@@ -27,4 +27,5 @@
     <string name="checkbox_prayed_success_text">prayerNote prayed for!</string>
     <string name="dialog_list_email">Email</string>
     <string name="dialog_list_gmail">Gmail</string>
+    <string name="error_activity_not_found">Error. Application not available.</string>
 </resources>

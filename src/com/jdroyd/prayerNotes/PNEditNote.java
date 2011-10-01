@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,6 +23,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PNEditNote extends Activity implements OnClickListener {
 
@@ -293,7 +294,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		Intent emailIntent = PNShareIntentsHandler.getInstance().getIntent(PNShareIntentsHandler.PNIntent.EMAIL);
         emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "This is the subject");
         emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "This is the text");
-        startActivityForResult(emailIntent, ACTIVITY_EMAIL_SHARE);
+        simpleStartShareActivity(emailIntent, ACTIVITY_EMAIL_SHARE);
 	}
 	
 	/**
@@ -301,7 +302,19 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 */
 	private void startGmailShareActivity() {
 		Intent gmailIntent = PNShareIntentsHandler.getInstance().getIntent(PNShareIntentsHandler.PNIntent.GMAIL);
-		startActivityForResult(gmailIntent, ACTIVITY_GMAIL_SHARE);
+		simpleStartShareActivity(gmailIntent, ACTIVITY_GMAIL_SHARE);
+	}
+	
+	/**
+	 * Simple function to start Activity and catch ActivityNotFoundException
+	 */
+	private void simpleStartShareActivity(Intent i, int activityId) {
+		try {
+			startActivityForResult(i, activityId);
+		}
+		catch( ActivityNotFoundException e ) {
+        	PNShareIntentsHandler.getInstance().onActivityNotFoundError(this);
+        }
 	}
 	
 	/**
@@ -338,11 +351,13 @@ public class PNEditNote extends Activity implements OnClickListener {
     			Log.v("PN", "email share activity OK");
     		else
     			Log.v("PN", "email share not ok: "+resultCode);
+    		break;
     	case ACTIVITY_GMAIL_SHARE:
     		if( resultCode == RESULT_OK)
     			Log.v("PN", "Gmail share activity OK");
     		else
     			Log.v("PN", "Gmail share not ok: "+resultCode);
+    		break;
     	}
     }
 	

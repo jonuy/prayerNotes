@@ -60,6 +60,7 @@ public final class R {
         public static final int edit_note_title=0x7f040007;
         public static final int edit_save_button=0x7f040008;
         public static final int edit_share_button=0x7f04000b;
+        public static final int error_activity_not_found=0x7f04001a;
         public static final int last_prayed_for=0x7f040001;
         public static final int main_list_empty=0x7f040006;
         public static final int new_note_title=0x7f040005;

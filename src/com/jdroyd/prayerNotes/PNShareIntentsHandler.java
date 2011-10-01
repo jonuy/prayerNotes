@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.widget.Toast;
 
 public class PNShareIntentsHandler {
 	
@@ -55,5 +56,12 @@ public class PNShareIntentsHandler {
 		
 		// If the list returns any, then Activity is available
 		return list.size() > 0;
+	}
+	
+	/**
+	 * Handles what to do when we catch an ActivityNotFoundException
+	 */
+	public void onActivityNotFoundError(Context context) {
+        Toast.makeText(context, R.string.error_activity_not_found, Toast.LENGTH_LONG);
 	}
 }
