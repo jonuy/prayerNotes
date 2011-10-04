@@ -1,6 +1,7 @@
 package com.jdroyd.prayerNotes;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,8 +30,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 
 	//TODO: move to file with all the constants?
 	public static final int ACTIVITY_IMG_GALLERY = 3;
-	public static final int ACTIVITY_EMAIL_SHARE = 4;
-	public static final int ACTIVITY_GMAIL_SHARE = 5;
+	public static final int ACTIVITY_SHARE = 4;
+	public static final int ACTIVITY_EMAIL_SHARE = 5;
+	public static final int ACTIVITY_GMAIL_SHARE = 6;
 	private static final int DIALOG_DELETE_NOTE = 0;
 	private static final int DIALOG_SHARE_NOTE = 1;
 	
@@ -208,7 +210,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 			finish();
 			break;
 		case R.id.edit_note_share:
-			showDialog(DIALOG_SHARE_NOTE);
+			startShareActivity();
 			break;
 		case R.id.edit_note_discard:
 			if( isNewNote() ) {
@@ -261,60 +263,36 @@ public class PNEditNote extends Activity implements OnClickListener {
 	}
 	
 	/**
-	 * Method to ensure Activities exist before they get added to the share list
+	 * Creates Intent and starts Activity to send/share the note
 	 */
-	private CharSequence[] getAvailableShareActivities() {
-		ArrayList<String> strItems = new ArrayList<String>();
+	private void startShareActivity() {
+		Intent i=new Intent(android.content.Intent.ACTION_SEND);
+		i.setType("text/plain");
+		//i.setType("images/*"); //TODO: use this for attached images?
 		
-		// Email Intent
-		if( PNShareIntentsHandler.getInstance()
-						   .isActivityAvailable(this, PNShareIntentsHandler.PNIntent.EMAIL) ) {
-			strItems.add(getResources().getText(R.string.dialog_list_email).toString());
+		// Subject set to: "prayerNote from <current date>"
+		String date = "";
+		if( mDbAdapter != null) {
+			// Use date note was created for subject line
+			if( mDateCreated > 0 )
+				date = mDbAdapter.convertDbDateToString(mDateCreated);
+			// Otherwise, use the current date
+			else
+				date = mDbAdapter.convertDbDateToString(mDbAdapter.getCurrentDateForDb());
 		}
 		
-		// Gmail Intent
-		if( PNShareIntentsHandler.getInstance()
-						   .isActivityAvailable(this, PNShareIntentsHandler.PNIntent.GMAIL) ) {
-			strItems.add(getResources().getText(R.string.dialog_list_gmail).toString());
-		}
+		String subject = getResources().getText(R.string.app_name) +
+			" from " + date;
+		i.putExtra(Intent.EXTRA_SUBJECT, subject);
 		
-		int numItems = strItems.size();
-		CharSequence[] items = new String[numItems];
-		for( int i=0; i<numItems; i++ ) {
-			items[i] = strItems.get(i);
-		}
+		// Get current text on screen, not what's saved in the database (could be old)
+		String text = mNoteText.getText().toString();
+		i.putExtra(Intent.EXTRA_TEXT, text);
 		
-		return items;
-	}
-	
-	/**
-	 * Starts email share Activity
-	 */
-	private void startEmailShareActivity() {
-		Intent emailIntent = PNShareIntentsHandler.getInstance().getIntent(PNShareIntentsHandler.PNIntent.EMAIL);
-        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "This is the subject");
-        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "This is the text");
-        simpleStartShareActivity(emailIntent, ACTIVITY_EMAIL_SHARE);
-	}
-	
-	/**
-	 * Starts Gmail share Activity
-	 */
-	private void startGmailShareActivity() {
-		Intent gmailIntent = PNShareIntentsHandler.getInstance().getIntent(PNShareIntentsHandler.PNIntent.GMAIL);
-		simpleStartShareActivity(gmailIntent, ACTIVITY_GMAIL_SHARE);
-	}
-	
-	/**
-	 * Simple function to start Activity and catch ActivityNotFoundException
-	 */
-	private void simpleStartShareActivity(Intent i, int activityId) {
-		try {
-			startActivityForResult(i, activityId);
-		}
-		catch( ActivityNotFoundException e ) {
-        	PNShareIntentsHandler.getInstance().onActivityNotFoundError(this);
-        }
+		// Use createChooser() to allow user to select application
+		Intent chooser = Intent.createChooser(i, 
+				getResources().getText(R.string.dialog_share_title));
+		startActivityForResult(chooser, ACTIVITY_SHARE);
 	}
 	
 	/**
@@ -346,17 +324,11 @@ public class PNEditNote extends Activity implements OnClickListener {
     			Log.w("PN", "ACTIVITY_IMG_GALLERY returned: "+resultCode);
     		}
     		break;
-    	case ACTIVITY_EMAIL_SHARE:
+    	case ACTIVITY_SHARE:
     		if( resultCode == RESULT_OK)
-    			Log.v("PN", "email share activity OK");
+    			Log.v("PN", "share activity OK");
     		else
-    			Log.v("PN", "email share not ok: "+resultCode);
-    		break;
-    	case ACTIVITY_GMAIL_SHARE:
-    		if( resultCode == RESULT_OK)
-    			Log.v("PN", "Gmail share activity OK");
-    		else
-    			Log.v("PN", "Gmail share not ok: "+resultCode);
+    			Log.v("PN", "share not ok: "+resultCode);
     		break;
     	}
     }
@@ -483,35 +455,6 @@ public class PNEditNote extends Activity implements OnClickListener {
 	}
 	
 	/**
-	 * Create dialog box with list of options for user to share the note
-	 */
-	private AlertDialog createShareDialog() {
-		// Determine if Activity is available before 
-		// List of share options
-		final CharSequence[] items = getAvailableShareActivities();
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.dialog_share_title);
-		builder.setItems(items, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int item) {
-				Log.v("SHARE", "clicked item:"+item);
-				switch(item) {
-				case 0:
-					startEmailShareActivity();
-					break;
-				case 1:
-					startGmailShareActivity();
-					break;
-				}
-			}
-		});
-		
-		AlertDialog alert = builder.create();
-		return alert;
-	}
-	
-	/**
 	 * Called first time showDialog() is called for a given id
 	 */
 	@Override
@@ -519,8 +462,6 @@ public class PNEditNote extends Activity implements OnClickListener {
 		switch(id) {
 		case DIALOG_DELETE_NOTE:
 			return createDeleteDialog();
-		case DIALOG_SHARE_NOTE:
-			return createShareDialog();
 		}
 
 		return super.onCreateDialog(id);
