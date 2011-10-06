@@ -40,6 +40,7 @@ public class PrayerNotes extends ListActivity {
 	
 	public static final int CONTEXT_DELETE_ID = 0;
 	public static final int CONTEXT_PRAYED_ID = 1;
+	public static final int CONTEXT_OPEN_ID = 2;
 	
 	private static final int DIALOG_DELETE_NOTE = 0;
 	
@@ -322,6 +323,7 @@ public class PrayerNotes extends ListActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,
     		ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
+    	menu.add(0, CONTEXT_OPEN_ID, 0, R.string.context_menu_open);
     	menu.add(0, CONTEXT_PRAYED_ID, 0, R.string.context_menu_prayed);
     	menu.add(0, CONTEXT_DELETE_ID, 0, R.string.context_menu_delete);
     }
@@ -350,6 +352,9 @@ public class PrayerNotes extends ListActivity {
 		    		// refresh ListView
 		    		populateList();
 	    		}
+	    		return true;
+	    	case CONTEXT_OPEN_ID:
+	    		editPrayerNote(rowId);
 	    		return true;
 	    	}
     	}
