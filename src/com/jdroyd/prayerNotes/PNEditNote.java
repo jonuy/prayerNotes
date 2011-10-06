@@ -1,12 +1,10 @@
 package com.jdroyd.prayerNotes;
 
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.io.File;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,17 +22,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class PNEditNote extends Activity implements OnClickListener {
 
 	//TODO: move to file with all the constants?
 	public static final int ACTIVITY_IMG_GALLERY = 3;
 	public static final int ACTIVITY_SHARE = 4;
-	public static final int ACTIVITY_EMAIL_SHARE = 5;
-	public static final int ACTIVITY_GMAIL_SHARE = 6;
 	private static final int DIALOG_DELETE_NOTE = 0;
-	private static final int DIALOG_SHARE_NOTE = 1;
 	
 	private PNDbAdapter mDbAdapter;
 	private EditText mNoteText;
@@ -268,7 +262,6 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private void startShareActivity() {
 		Intent i=new Intent(android.content.Intent.ACTION_SEND);
 		i.setType("text/plain");
-		//i.setType("images/*"); //TODO: use this for attached images?
 		
 		// Subject set to: "prayerNote from <current date>"
 		String date = "";
@@ -288,6 +281,12 @@ public class PNEditNote extends Activity implements OnClickListener {
 		// Get current text on screen, not what's saved in the database (could be old)
 		String text = mNoteText.getText().toString();
 		i.putExtra(Intent.EXTRA_TEXT, text);
+		
+		// Attach image to the intent.  Change Type
+		if( mImgFilePath != null ) {
+			i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(mImgFilePath)));
+			i.setType("image/*");
+		}
 		
 		// Use createChooser() to allow user to select application
 		Intent chooser = Intent.createChooser(i, 
