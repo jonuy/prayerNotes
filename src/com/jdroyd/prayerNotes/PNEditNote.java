@@ -1,6 +1,9 @@
 package com.jdroyd.prayerNotes;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -338,7 +341,6 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 * @param strFilePath file path to the image to display
 	 */
 	private void setNoteImageToView(String strFilePath) {
-		Bitmap selectedImg = BitmapFactory.decodeFile(strFilePath);
 		if( mImgView != null ) {
 			//TODO: place the values in a resource file instead of using magic numbers
 			float scale = getResources().getDisplayMetrics().density;
@@ -350,12 +352,54 @@ public class PNEditNote extends Activity implements OnClickListener {
 			frame.height = (int)newHeight;
 			mImgView.setLayoutParams(frame);
 			
+			int req_size = frame.width > frame.height ? frame.width : frame.height;
+			Bitmap selectedImg = decodeFile(strFilePath, req_size);
+			
 			mImgView.setImageBitmap(selectedImg);
 		}
 		
 		if( mRemoveImgIcon != null ) {
 			mRemoveImgIcon.setVisibility(View.VISIBLE);
 		}
+	}
+	
+	/**
+	 * TODO: This is the same as what's in PrayerNotes class.  Consolidate?
+	 * Returns a Bitmap that's a subsample of the original image.  Allows
+	 * us to retrieve an image that requires less memory and can help us
+	 * avoid the OOM exceptions.
+	 */
+	private Bitmap decodeFile(String filePath, int req_size){
+		Bitmap img = null;
+		try {
+			// Decode image size
+			BitmapFactory.Options o = new BitmapFactory.Options();
+			o.inJustDecodeBounds = true;
+		
+			FileInputStream fis = new FileInputStream(filePath);
+			BitmapFactory.decodeStream(fis, null, o);
+			fis.close();
+
+			int scale = 1;
+			if (o.outHeight > req_size || o.outWidth > req_size) {
+				scale = (int)Math.pow(2, (int) Math.round(Math.log(req_size 
+						/ (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
+			}
+		
+			// Decode with inSampleSize
+			BitmapFactory.Options o2 = new BitmapFactory.Options();
+			o2.inSampleSize = scale;
+			fis = new FileInputStream(filePath);
+			img = BitmapFactory.decodeStream(fis, null, o2);
+			fis.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			Log.e("PN", "Image file not found during decoding: "+filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Log.e("PN", "Image IOException during decoding: "+filePath);
+		}
+		return img;
 	}
 	
 	/**
