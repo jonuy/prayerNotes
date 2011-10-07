@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -91,6 +92,9 @@ public class PrayerNotes extends ListActivity {
         registerForContextMenu(getListView());
     }
     
+    /**
+     * Display a Toast message for unfinished features
+     */
     private void displayComingSoon() {
     	Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show();
     }

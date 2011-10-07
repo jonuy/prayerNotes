@@ -17,6 +17,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -31,7 +34,11 @@ public class PNEditNote extends Activity implements OnClickListener {
 	//TODO: move to file with all the constants?
 	public static final int ACTIVITY_IMG_GALLERY = 3;
 	public static final int ACTIVITY_SHARE = 4;
+	
 	private static final int DIALOG_DELETE_NOTE = 0;
+	private static final int DIALOG_CANCEL_EDIT = 1;
+	
+	private static final int MENU_CANCEL_ID = 0;
 	
 	private PNDbAdapter mDbAdapter;
 	private EditText mNoteText;
@@ -52,6 +59,11 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private int mDateCreated;
 	// Stored date note was last prayed
 	private int mDatePrayed;
+	
+	// Cache original values so we can check if any edits have been made later
+	private String mNoteText_Original;
+	private String mImgFilePath_Original;
+	private int mDatePrayed_Original;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +132,94 @@ public class PNEditNote extends Activity implements OnClickListener {
 		
 		// If applicable, will fill out UI with the saved note data
 		populateFields();
+		
+		// Cache original values.  Must be done after populateFields() since
+		// that gets and populates the initial data from the Cursor
+		cacheOriginalNoteValues();
 	}
+	
+	/**
+	 * Cache original values so we can compare later to determine if edits
+	 * have been made
+	 */
+	private void cacheOriginalNoteValues() {
+		if( mNoteText != null ) {
+			mNoteText_Original = mNoteText.getText().toString();
+		}
+		mImgFilePath_Original = mImgFilePath;
+		mDatePrayed_Original = mDatePrayed;
+	}
+	
+	/**
+     * Manually called in handled cases where we want to exit that Activity
+     */
+    private void exitActivity() {
+    	setResult(RESULT_OK);
+		finish();
+    }
+	
+	/**
+     * Add to the Options Menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	super.onCreateOptionsMenu(menu);
+    	menu.add(0, MENU_CANCEL_ID, 0, R.string.edit_menu_cancel);
+    	return true;
+    }
+    
+    /**
+     * Handle behavior when an options menu item is selected
+     */
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+    	switch( item.getItemId() ) {
+    	case MENU_CANCEL_ID:
+    		cancelActivityRequest();
+    		return true;
+    	}
+    	return super.onMenuItemSelected(featureId, item);
+    }
+    
+    /**
+     * Handle Back button presses for pre-2.0 versions
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ECLAIR
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            // Take care of calling this method on earlier versions (pre-2.0) of
+            // the platform where it doesn't exist.
+            onBackPressed();
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * Handle behavior when Back button is pressed
+     */
+    @Override
+    public void onBackPressed() {
+        cancelActivityRequest();
+        return;
+    }
+    
+    /**
+     * Behavior of Activity when user presses Back button or Cancel from menu
+     *  - check if any changes were made, get confirmation from user to abandon
+     *  changes, and then cancel Activity
+     */
+    private void cancelActivityRequest() {
+    	if( isNoteChanged() ) {
+    		// Confirm player wants to abandon changes before exiting
+    		showDialog(DIALOG_CANCEL_EDIT);
+    	}
+    	else {
+    		exitActivity();
+    	}
+    }
 	
 	/**
 	 * Helper to determine whether or not user is editing an already existing 
@@ -129,6 +228,45 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 */
 	private boolean isNewNote() {
 		return (mDbRowId == null) ? true : false;
+	}
+	
+	/**
+	 * Determines if note has been edited or not
+	 * @return true if edited, false otherwise
+	 */
+	private boolean isNoteChanged() {
+		if( mNoteText != null ) {
+			String currText = mNoteText.getText().toString();
+			// One string may be null and the other is not
+			if( (currText != null && mNoteText_Original == null) || 
+				(currText == null && mNoteText_Original != null) )
+				return true;
+			
+			// Check if text has changed
+			if( currText != null && mNoteText_Original != null ) {
+				if( currText.compareTo(mNoteText_Original) != 0 )
+					return true;
+			}
+		}
+		
+		// One may be null and the other is not
+		if( (mImgFilePath_Original != null && mImgFilePath == null) ||
+			(mImgFilePath_Original == null && mImgFilePath != null) ) {
+			return true;
+		}
+		
+		// Check if selected images have changed
+		if( mImgFilePath != null && mImgFilePath_Original != null ) {
+			if( mImgFilePath.compareTo(mImgFilePath_Original) != 0 )
+				return true;
+		}
+		
+		// Check if date prayed has changed
+		if( mDatePrayed_Original != mDatePrayed ) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -210,13 +348,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 			startShareActivity();
 			break;
 		case R.id.edit_note_discard:
-			if( isNewNote() ) {
-				setResult(RESULT_OK);
-				finish();
-			}
-			else {
+			if( isNewNote() )
+				exitActivity();
+			else
 				showDialog(DIALOG_DELETE_NOTE);
-			}
 			break;
 		case R.id.edit_note_img:
 			startGalleryActivity();
@@ -482,14 +617,37 @@ public class PNEditNote extends Activity implements OnClickListener {
 					}
 					
 					// Exit the Activity
-					setResult(RESULT_OK);
-					finish();
+					exitActivity();
 				}
 			})
 			.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					// Dismiss dialog with no changes made
+					dialog.cancel();
+				}
+			});
+		
+		AlertDialog alert = builder.create();
+		return alert;
+	}
+	
+	/**
+	 * Create dialog box prompting user to confirm abandoning any edits made.
+	 */
+	private AlertDialog createCancelEditDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.dialog_cancel_edit)
+			.setCancelable(false)
+			.setPositiveButton(R.string.dialog_yes,	new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					exitActivity();
+				}
+			})
+			.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
 					dialog.cancel();
 				}
 			});
@@ -506,6 +664,8 @@ public class PNEditNote extends Activity implements OnClickListener {
 		switch(id) {
 		case DIALOG_DELETE_NOTE:
 			return createDeleteDialog();
+		case DIALOG_CANCEL_EDIT:
+			return createCancelEditDialog();
 		}
 
 		return super.onCreateDialog(id);

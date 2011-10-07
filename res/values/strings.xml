@@ -15,12 +15,14 @@
     <string name="edit_share_button">Share</string>
     <string name="edit_note_text_title">Edit prayerNote:</string>
     <string name="edit_note_img_title">Attach an image:</string>
+    <string name="edit_menu_cancel">Cancel</string>
     <string name="context_menu_open">Open</string>
     <string name="context_menu_delete">Delete</string>
     <string name="context_menu_prayed">Mark as prayed for</string>
     <string name="context_prayed_success">prayerNote prayed for!</string>
     <string name="coming_soon">Coming Soon!</string>
     <string name="dialog_delete_confirm">Are you sure you want to delete this prayerNote?</string>
+    <string name="dialog_cancel_edit">Are you sure you want to abandon all changes?</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
     <string name="dialog_share_title">Share via:</string>
