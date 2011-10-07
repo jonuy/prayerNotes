@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
     <RelativeLayout
+    	android:id="@+id/main_banner"
     	android:orientation="horizontal"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content">
@@ -23,14 +25,25 @@
     </RelativeLayout>
     <!-- ListView used when data is present -->
     <ListView android:id="@+id/android:list"
+    	android:layout_below="@id/main_banner"
     	android:layout_width="fill_parent"
     	android:layout_height="fill_parent"
     	android:fadeScrollbars="true"
     	/>
     <!-- Optional view if no data is present for the list -->
     <TextView android:id="@+id/android:empty"
+    	android:layout_below="@id/main_banner"
     	android:text="@string/main_list_empty"
     	android:layout_width="wrap_content"
     	android:layout_height="wrap_content"
     	/>
-</LinearLayout>
+    <!-- AdMob View on bottom banner -->
+    <com.google.ads.AdView android:id="@+id/main_admob_banner"
+    	android:layout_alignParentBottom="true"
+    	android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"
+    	ads:adUnitId="a14e8e67b54948b"
+    	ads:adSize="BANNER"
+    	ads:loadAdOnCreate="true"
+    	/>
+</RelativeLayout>
