@@ -209,7 +209,8 @@ public class PNDbAdapter {
 		return mDb.query(PN_DATABASE_TABLE_NAME, 
 				new String[] {PNKEY_ROWID, PNKEY_NOTE_TEXT, PNKEY_NOTE_IMG, 
 				PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED}, 
-				null, null, null, null, null);
+				null, null, null, null, PNKEY_ROWID+" DESC");
+		//ORDER BY _id DESC will place newest notes at top of the list
 	}
 	
 	/**
