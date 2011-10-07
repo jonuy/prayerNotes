@@ -24,14 +24,15 @@ public final class R {
         public static final int edit_note_save=0x7f050005;
         public static final int edit_note_share=0x7f050006;
         public static final int edit_note_text=0x7f050002;
-        public static final int main_admob_banner=0x7f05000a;
+        public static final int main_admob_banner=0x7f05000b;
         public static final int main_banner=0x7f050008;
         public static final int main_button_add=0x7f050009;
-        public static final int main_note_row_created=0x7f05000e;
-        public static final int main_note_row_created_text=0x7f05000d;
-        public static final int main_note_row_img=0x7f05000b;
-        public static final int main_note_row_status=0x7f05000f;
-        public static final int main_note_row_text=0x7f05000c;
+        public static final int main_button_search=0x7f05000a;
+        public static final int main_note_row_created=0x7f05000f;
+        public static final int main_note_row_created_text=0x7f05000e;
+        public static final int main_note_row_img=0x7f05000c;
+        public static final int main_note_row_status=0x7f050010;
+        public static final int main_note_row_text=0x7f05000d;
     }
     public static final class layout {
         public static final int edit_note=0x7f030000;

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -70,16 +71,28 @@ public class PrayerNotes extends ListActivity {
         // Display any existing data to the ListView
         populateList();
         
-        // Setup click listener for the Add button
+        // Setup click listener for the buttons
         Button addButton = (Button)findViewById(R.id.main_button_add);
         addButton.setOnClickListener(new View.OnClickListener() {        	
+        	@Override
         	public void onClick(View view) {
         		createPrayerNote();
         	}
         });
+        Button searchButton = (Button)findViewById(R.id.main_button_search);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+        	@Override
+			public void onClick(View v) {
+				displayComingSoon();
+			}
+        });
         
         // Register ListView for context menus
         registerForContextMenu(getListView());
+    }
+    
+    private void displayComingSoon() {
+    	Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show();
     }
     
     /**
@@ -158,9 +171,6 @@ public class PrayerNotes extends ListActivity {
 	    					notesCursor.getColumnIndexOrThrow(PNDbAdapter.PNKEY_LAST_PRAYED) );
 	    			
 	    			int pos = notesCursor.getPosition();
-	    			Log.v("populateList()", pos+": noteId="+noteId+" / noteText:"
-	    					+noteText+" / noteImg:"+noteImg+" / dateCreated:"
-	    					+dateCreated+" / lastPrayed:"+lastPrayed);
 	    			
 	    			HashMap<String,Object> noteHash = new HashMap<String,Object>();
 	    			
@@ -202,6 +212,36 @@ public class PrayerNotes extends ListActivity {
 	    		}
     		}
     	}
+    	
+    	// Sort the list.  Notes not prayed for are moved to the top.
+    	int listEnd = noteList.size();
+    	for( int i=0; i<listEnd; i++) {
+    		HashMap<String, Object> hash = noteList.get(i);
+    		String lastPrayed = (String)hash.get(PNDbAdapter.PNKEY_LAST_PRAYED);
+    		
+    		// If it's been prayed for, move to the end of the list
+    		// checking against "Never" string
+    		if( lastPrayed != getResources().getText(R.string.date_never).toString() ) {
+    			// add copy of note to end of list
+    			noteList.add(hash);
+    			// remove it from its old position
+    			noteList.remove(i);
+    			// decrement so that we don't re-evaluate moved notes
+    			listEnd--;
+    		}
+    	}
+    	
+    	/*for( Iterator<HashMap<String, Object>> it = noteList.iterator(); it.hasNext(); ) {
+    		HashMap<String, Object> hash = (HashMap<String, Object>)it.next();
+	    	int noteId = (Integer)hash.get(PNDbAdapter.PNKEY_ROWID);
+			String noteText = (String)hash.get(PNDbAdapter.PNKEY_NOTE_TEXT);
+			String noteImg = (String)hash.get(PNDbAdapter.PNKEY_NOTE_IMG);
+			String dateCreated = (String)hash.get(PNDbAdapter.PNKEY_DATE_CREATED);
+			String lastPrayed = (String)hash.get(PNDbAdapter.PNKEY_LAST_PRAYED);
+	    	Log.v("SORT","noteId="+noteId+" / noteText:"
+					+noteText+" / noteImg:"+noteImg+" / dateCreated:"
+					+dateCreated+" / lastPrayed:"+lastPrayed);
+    	}*/
     	
     	String[] fromColumns = new String[]{
     			PNDbAdapter.PNKEY_NOTE_TEXT, PNDbAdapter.PNKEY_NOTE_IMG,
