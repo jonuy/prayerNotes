@@ -67,6 +67,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private String mImgFilePath_Original;
 	private int mDatePrayed_Original;
 	
+	// Dialog used to set reminder
+	private PNAlarmSetter mAlarmSetter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -667,7 +670,19 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 * Create dialog box for user to set alarm reminder.
 	 */
 	private Dialog createSetAlarmDialog() {
-		return PNAlarmManager.getInstance().createDialog(this);
+		mAlarmSetter = new PNAlarmSetter(this);
+		mAlarmSetter.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				String txt1="", txt2="";
+				if( mAlarmSetter != null ) {
+					txt1 = mAlarmSetter.getTime();
+					txt2 = mAlarmSetter.getDate();
+				}
+				Log.v("PN", "dialog has been dismissed - "+txt1+" "+txt2);
+			}
+		});
+		return mAlarmSetter;
 	}
 	
 	/**
