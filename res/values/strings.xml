@@ -8,6 +8,7 @@
     <string name="date_never">Never</string>
     <string name="new_note_title">Create a prayerNote</string>
     <string name="main_list_empty">No prayerNotes saved.  Create a new one!</string>
+    <string name="edit_alarm_button">Set a Reminder</string>
     <string name="edit_note_title">Edit a prayerNote</string>
     <string name="edit_save_button">Save</string>
     <string name="edit_discard_button">Discard</string>
@@ -23,8 +24,13 @@
     <string name="coming_soon">Coming Soon!</string>
     <string name="dialog_delete_confirm">Are you sure you want to delete this prayerNote?</string>
     <string name="dialog_cancel_edit">Are you sure you want to abandon all changes?</string>
+    <string name="dialog_alarm_title">Set a Reminder</string>
+    <string name="dialog_alarm_set_date">Set Date</string>
+    <string name="dialog_alarm_set_time">Set Time</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
+    <string name="dialog_ok">Ok</string>
+    <string name="dialog_cancel">Cancel</string>
     <string name="dialog_share_title">Share via:</string>
     <string name="checkbox_prayed_for_text">Mark as prayed for</string>
     <string name="checkbox_prayed_success_text">prayerNote prayed for!</string>

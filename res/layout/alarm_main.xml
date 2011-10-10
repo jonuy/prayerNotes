@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/layout_alarm_main"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<TextView android:id="@+id/alarm_main_time"
+		android:layout_centerHorizontal="true"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="30sp"
+		android:text="00:00"/>
+	<TextView android:id="@+id/alarm_main_date"
+		android:layout_centerHorizontal="true"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/alarm_main_time"
+		android:textSize="20sp"
+		android:text="01/01/2011"/>
+	<RelativeLayout
+		android:layout_centerHorizontal="true"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/alarm_main_date">
+		<LinearLayout android:id="@+id/alarm_main_set_container"
+			android:orientation="horizontal"
+			android:layout_centerHorizontal="true"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+			<Button android:id="@+id/alarm_main_date_button"
+				android:text="@string/dialog_alarm_set_date"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
+			<Button android:id="@+id/alarm_main_time_button"
+				android:text="@string/dialog_alarm_set_time"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
+		</LinearLayout>
+		<Button android:id="@+id/alarm_main_ok_button"
+			android:text="@string/dialog_ok"
+			android:layout_below="@id/alarm_main_set_container"
+			android:layout_alignLeft="@id/alarm_main_set_container"
+			android:layout_alignRight="@id/alarm_main_set_container"
+			android:layout_centerHorizontal="true"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+	</RelativeLayout>
+</RelativeLayout>

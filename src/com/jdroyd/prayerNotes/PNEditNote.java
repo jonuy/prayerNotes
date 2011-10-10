@@ -37,6 +37,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	
 	private static final int DIALOG_DELETE_NOTE = 0;
 	private static final int DIALOG_CANCEL_EDIT = 1;
+	private static final int DIALOG_SET_ALARM = 2;
 	
 	private static final int MENU_CANCEL_ID = 0;
 	
@@ -48,6 +49,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private Button mSaveButton;
 	private Button mShareButton;
 	private Button mDiscardButton;
+	private Button mAlarmButton;
 	private ImageView mImgView;
 	private ImageView mRemoveImgIcon;
 	private CheckBox mPrayedForCheckBox;
@@ -78,6 +80,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mSaveButton = (Button)findViewById(R.id.edit_note_save);
 		mShareButton = (Button)findViewById(R.id.edit_note_share);
 		mDiscardButton = (Button)findViewById(R.id.edit_note_discard);
+		mAlarmButton = (Button)findViewById(R.id.edit_note_alarm);
 		mImgView = (ImageView)findViewById(R.id.edit_note_img);
 		mRemoveImgIcon = (ImageView)findViewById(R.id.edit_note_img_remove);
 		mPrayedForCheckBox = (CheckBox)findViewById(R.id.edit_note_prayedFor);
@@ -86,6 +89,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mSaveButton.setOnClickListener(this);
 		mShareButton.setOnClickListener(this);
 		mDiscardButton.setOnClickListener(this);
+		mAlarmButton.setOnClickListener(this);
 		mImgView.setOnClickListener(this);
 		mRemoveImgIcon.setOnClickListener(this);
 		mPrayedForCheckBox.setOnClickListener(this);
@@ -352,6 +356,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 				exitActivity();
 			else
 				showDialog(DIALOG_DELETE_NOTE);
+			break;
+		case R.id.edit_note_alarm:
+				showDialog(DIALOG_SET_ALARM);
 			break;
 		case R.id.edit_note_img:
 			startGalleryActivity();
@@ -657,6 +664,13 @@ public class PNEditNote extends Activity implements OnClickListener {
 	}
 	
 	/**
+	 * Create dialog box for user to set alarm reminder.
+	 */
+	private Dialog createSetAlarmDialog() {
+		return PNAlarmManager.getInstance().createDialog(this);
+	}
+	
+	/**
 	 * Called first time showDialog() is called for a given id
 	 */
 	@Override
@@ -666,6 +680,8 @@ public class PNEditNote extends Activity implements OnClickListener {
 			return createDeleteDialog();
 		case DIALOG_CANCEL_EDIT:
 			return createCancelEditDialog();
+		case DIALOG_SET_ALARM:
+			return createSetAlarmDialog();
 		}
 
 		return super.onCreateDialog(id);

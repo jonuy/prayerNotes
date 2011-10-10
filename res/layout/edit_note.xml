@@ -39,7 +39,7 @@
 		android:layout_height="wrap_content"
 		android:minLines="4"
 		android:gravity="top"
-		android:textSize="10dp"/>
+		android:textSize="10sp"/>
 	
 	<!-- CheckBox and accompanying TextView are visibility=gone by default.
 		 These elements will only be visible when editing an already existing 
@@ -62,7 +62,7 @@
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
+		android:layout_height="wrap_content">
 		
 		<!-- TODO: consider adding padding around the buttons -->
 		<Button android:id="@+id/edit_note_save"
@@ -77,6 +77,15 @@
 			android:text="@string/edit_discard_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"/>
-			
 	</LinearLayout>
+	
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Reminder set for: "/>
+	<Button android:id="@+id/edit_note_alarm"
+		android:text="@string/edit_alarm_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
+	
 </LinearLayout>
