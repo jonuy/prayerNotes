@@ -672,14 +672,22 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private Dialog createSetAlarmDialog() {
 		mAlarmSetter = new PNAlarmSetter(this);
 		mAlarmSetter.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			
+			// Update display when dialog is closed
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				String txt1="", txt2="";
 				if( mAlarmSetter != null ) {
-					txt1 = mAlarmSetter.getTime();
-					txt2 = mAlarmSetter.getDate();
+					String setTime = mAlarmSetter.getTime();
+					String setDate = mAlarmSetter.getDate();
+					if( setTime!=null && setDate!=null ) {
+						// if time and date are set, update display
+						Log.v("PN", setTime+" / "+setDate);
+/////////						displaySetAlarm(setTime, setDate);
+					}
+					
+					// Clean mAlarmSetter for future use
+					mAlarmSetter = null;
 				}
-				Log.v("PN", "dialog has been dismissed - "+txt1+" "+txt2);
 			}
 		});
 		return mAlarmSetter;
