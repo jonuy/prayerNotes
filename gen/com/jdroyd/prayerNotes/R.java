@@ -23,6 +23,8 @@ public final class R {
         public static final int alarm_main_time=0x7f050001;
         public static final int alarm_main_time_button=0x7f050005;
         public static final int edit_note_alarm=0x7f05000f;
+        public static final int edit_note_alarm_remove=0x7f050011;
+        public static final int edit_note_alarm_status=0x7f050010;
         public static final int edit_note_discard=0x7f05000e;
         public static final int edit_note_img=0x7f050007;
         public static final int edit_note_img_remove=0x7f050008;
@@ -32,15 +34,15 @@ public final class R {
         public static final int edit_note_share=0x7f05000d;
         public static final int edit_note_text=0x7f050009;
         public static final int layout_alarm_main=0x7f050000;
-        public static final int main_admob_banner=0x7f050013;
-        public static final int main_banner=0x7f050010;
-        public static final int main_button_add=0x7f050011;
-        public static final int main_button_search=0x7f050012;
-        public static final int main_note_row_created=0x7f050017;
-        public static final int main_note_row_created_text=0x7f050016;
-        public static final int main_note_row_img=0x7f050014;
-        public static final int main_note_row_status=0x7f050018;
-        public static final int main_note_row_text=0x7f050015;
+        public static final int main_admob_banner=0x7f050015;
+        public static final int main_banner=0x7f050012;
+        public static final int main_button_add=0x7f050013;
+        public static final int main_button_search=0x7f050014;
+        public static final int main_note_row_created=0x7f050019;
+        public static final int main_note_row_created_text=0x7f050018;
+        public static final int main_note_row_img=0x7f050016;
+        public static final int main_note_row_status=0x7f05001a;
+        public static final int main_note_row_text=0x7f050017;
     }
     public static final class layout {
         public static final int alarm_main=0x7f030000;

@@ -50,9 +50,11 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private Button mShareButton;
 	private Button mDiscardButton;
 	private Button mAlarmButton;
+	private ImageView mAlarmRemoveIcon;
 	private ImageView mImgView;
 	private ImageView mRemoveImgIcon;
 	private CheckBox mPrayedForCheckBox;
+	private TextView mAlarmStatus;
 	private TextView mPrayedForStatus;
 	
 	// Selected file path of image, if any
@@ -84,9 +86,11 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mShareButton = (Button)findViewById(R.id.edit_note_share);
 		mDiscardButton = (Button)findViewById(R.id.edit_note_discard);
 		mAlarmButton = (Button)findViewById(R.id.edit_note_alarm);
+		mAlarmRemoveIcon = (ImageView)findViewById(R.id.edit_note_alarm_remove);
 		mImgView = (ImageView)findViewById(R.id.edit_note_img);
 		mRemoveImgIcon = (ImageView)findViewById(R.id.edit_note_img_remove);
 		mPrayedForCheckBox = (CheckBox)findViewById(R.id.edit_note_prayedFor);
+		mAlarmStatus = (TextView)findViewById(R.id.edit_note_alarm_status);
 		mPrayedForStatus = (TextView)findViewById(R.id.edit_note_prayedFor_status);
 
 		mSaveButton.setOnClickListener(this);
@@ -96,6 +100,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mImgView.setOnClickListener(this);
 		mRemoveImgIcon.setOnClickListener(this);
 		mPrayedForCheckBox.setOnClickListener(this);
+		mAlarmRemoveIcon.setOnClickListener(this);
 		
 		// Get row id of note being edited, if any
 		mDbRowId = (savedInstanceState == null) ? null :
@@ -361,7 +366,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 				showDialog(DIALOG_DELETE_NOTE);
 			break;
 		case R.id.edit_note_alarm:
-				showDialog(DIALOG_SET_ALARM);
+			showDialog(DIALOG_SET_ALARM);
 			break;
 		case R.id.edit_note_img:
 			startGalleryActivity();
@@ -371,6 +376,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 			break;
 		case R.id.edit_note_prayedFor:
 			onNoteIsPrayedFor( ((CheckBox)v).isChecked() );
+			break;
+		case R.id.edit_note_alarm_remove:
+			removeAlarm();
 			break;
 		}
 	}
@@ -611,6 +619,32 @@ public class PNEditNote extends Activity implements OnClickListener {
 	}
 	
 	/**
+	 * Set status text and display
+	 */
+	private void displaySetAlarm(String time, String date) {
+		// Update status Text
+		if( mAlarmStatus != null ) {
+			mAlarmStatus.setText("Reminder set for: "+time+" "+date);
+			mAlarmStatus.setVisibility(View.VISIBLE);
+		}
+		
+		// Show image
+		if( mAlarmRemoveIcon != null )
+			mAlarmRemoveIcon.setVisibility(View.VISIBLE);
+	}
+	
+	/**
+	 * Hide relevant UI and clear alarm
+	 */
+	private void removeAlarm() {
+		if( mAlarmStatus != null )
+			mAlarmStatus.setVisibility(View.GONE);
+		
+		if( mAlarmRemoveIcon != null )
+			mAlarmRemoveIcon.setVisibility(View.GONE);
+	}
+	
+	/**
 	 * Create dialog box prompting user to confirm delete action.
 	 * showDialog() will take care to display it.
 	 */
@@ -681,12 +715,8 @@ public class PNEditNote extends Activity implements OnClickListener {
 					String setDate = mAlarmSetter.getDate();
 					if( setTime!=null && setDate!=null ) {
 						// if time and date are set, update display
-						Log.v("PN", setTime+" / "+setDate);
-/////////						displaySetAlarm(setTime, setDate);
+						displaySetAlarm(setTime, setDate);
 					}
-					
-					// Clean mAlarmSetter for future use
-					mAlarmSetter = null;
 				}
 			}
 		});

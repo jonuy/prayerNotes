@@ -20,8 +20,8 @@ import android.widget.TimePicker;
  */
 public class PNAlarmSetter extends Dialog implements OnClickListener {
 	
-	private static final int DIALOG_DATE_ID = 0;
-	private static final int DIALOG_TIME_ID = 1;
+	private static final String AM = "AM";
+	private static final String PM = "PM";
 	
 	private Context mContext;
 	
@@ -133,7 +133,7 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 	private void updateDisplay() {
 		mTime = pad(mHour) + ":" + 
 				pad(mMinute) + " " + 
-				((mAM_PM == Calendar.AM) ? "AM" : "PM");
+				((mAM_PM == Calendar.AM) ? AM : PM);
 		// Month is 0 based, so add 1
 		mDate = (mMonth+1) + "/" + 
 				mDay + "/" + 
@@ -177,6 +177,14 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 				mHour = hourOfDay;
+				if( mHour > 12 ) {
+					mHour -= 12;
+					mAM_PM = Calendar.PM;
+				}
+				else {
+					mAM_PM = Calendar.AM;
+				}
+				
 				mMinute = minute;
 				
 				updateDisplay();
