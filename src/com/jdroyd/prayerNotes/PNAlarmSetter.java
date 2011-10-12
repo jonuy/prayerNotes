@@ -2,7 +2,6 @@ package com.jdroyd.prayerNotes;
 
 import java.util.Calendar;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -10,6 +9,8 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -224,17 +225,41 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 	 * Setup the event using AlarmManager
 	 */
 	public void scheduleAlarm(Calendar time, Long position, String contentText) {
-		if( time != null ) {
+		if( time != null && position != null && contentText != null ) {
 			Intent intent = new Intent(mContext, PNAlarmReceiver.class);
+			// set Uri data to distinguish between intents for different notes 
+			intent.setData(Uri.parse("note_id:"+position));
+			
 			intent.putExtra(PNDbAdapter.PNKEY_ROWID, position);
 			//TODO: get "content_text" statically defined somewhere
 			intent.putExtra("content_text", contentText);
 			// TODO: use static var instead of 102984 for request code
 			PendingIntent sender = PendingIntent.getBroadcast(mContext, 102984, 
+					intent, PendingIntent.FLAG_UPDATE_CURRENT /*FLAG_CANCEL_CURRENT*//* FLAG_UPDATE_CURRENT*/);
+			
+			AlarmManager am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
+			Log.v("ALARM", "SETTING ALARM FOR: note="+position+" @ time="+time.getTime().toString());
+			am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), sender);
+		}
+	}
+	
+	/**
+	 * Cancel alarm
+	 */
+	public void cancelAlarm(Long position) {
+		// Recreate the PendingIntent to cancel the alarm
+		if( position != null ) {
+			Intent intent = new Intent(mContext, PNAlarmReceiver.class);
+			// set Uri data to distinguish between intents for different notes 
+			intent.setData(Uri.parse("note_id:"+position));
+			
+			intent.putExtra(PNDbAdapter.PNKEY_ROWID, position);
+			
+			PendingIntent sender = PendingIntent.getBroadcast(mContext, 102984, 
 					intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			
 			AlarmManager am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
-			am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), sender);
+			am.cancel(sender);
 		}
 	}
 }

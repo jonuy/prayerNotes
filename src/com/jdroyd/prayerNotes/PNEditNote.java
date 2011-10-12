@@ -355,7 +355,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch( v.getId() ) {
 		case R.id.edit_note_save:
-			// Set alarm
+			// Only set alarm when saving before leaving
 			if( mAlarmSetter != null && mAlarmTime != null && mDbRowId != null) {
 				// Create string used for ticker text
 				String textPreFormat = getResources()
@@ -657,6 +657,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 		// clear the set alarm
 		mAlarmTime = null;
 		
+		// cancel it from the AlarmManager
+		if( mAlarmSetter != null && mDbRowId != null )
+			mAlarmSetter.cancelAlarm(mDbRowId);
+		
 		// and hide ui
 		if( mAlarmStatus != null )
 			mAlarmStatus.setVisibility(View.GONE);
@@ -732,6 +736,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				if( mAlarmSetter != null ) {
+					// Set alarm time
 					mAlarmTime = mAlarmSetter.getAlarmTime();
 					
 					String setTime = mAlarmSetter.getTime();
