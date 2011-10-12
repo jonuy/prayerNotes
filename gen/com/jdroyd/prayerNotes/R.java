@@ -87,5 +87,7 @@ public final class R {
         public static final int last_prayed_for=0x7f040001;
         public static final int main_list_empty=0x7f040006;
         public static final int new_note_title=0x7f040005;
+        public static final int ticker_content=0x7f040025;
+        public static final int ticker_title=0x7f040024;
     }
 }

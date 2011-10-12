@@ -2,10 +2,14 @@ package com.jdroyd.prayerNotes;
 
 import java.util.Calendar;
 
+import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -42,6 +46,10 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 	private int mHour;
 	private int mMinute;
 	private int mAM_PM;
+	
+	// Calendar object for the last set date and time
+	private Calendar mAlarmTime;
+	
 	
 	/**
 	 * Constructor
@@ -98,23 +106,35 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 			createTimeDialog();
 			break;
 		case R.id.alarm_main_ok_button:
+			// Update Calendar obj with current date and time
+			if( mAlarmTime == null ) {
+				mAlarmTime = Calendar.getInstance();
+			}
+			mAlarmTime.set(mYear, mMonth, mDay, mHour, mMinute);
 			dismiss();
 			break;
 		}
 	}
 	
 	/**
-	 * Accessor to return Time string
+	 * Accessor to get Time string
 	 */
 	public String getTime() {
 		return mTime;
 	}
 	
 	/**
-	 * Accessor to return Date string
+	 * Accessor to get Date string
 	 */
 	public String getDate() {
 		return mDate;
+	}
+	
+	/**
+	 * Accessor to get Calendar object with the set alarm time
+	 */
+	public Calendar getAlarmTime() {
+		return mAlarmTime;
 	}
 	
 	/**
@@ -200,7 +220,21 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 		timePicker.show();
 	}
 	
-	public void scheduleAlarm() {
-		
+	/**
+	 * Setup the event using AlarmManager
+	 */
+	public void scheduleAlarm(Calendar time, Long position, String contentText) {
+		if( time != null ) {
+			Intent intent = new Intent(mContext, PNAlarmReceiver.class);
+			intent.putExtra(PNDbAdapter.PNKEY_ROWID, position);
+			//TODO: get "content_text" statically defined somewhere
+			intent.putExtra("content_text", contentText);
+			// TODO: use static var instead of 102984 for request code
+			PendingIntent sender = PendingIntent.getBroadcast(mContext, 102984, 
+					intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			
+			AlarmManager am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
+			am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), sender);
+		}
 	}
 }

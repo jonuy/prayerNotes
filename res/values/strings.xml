@@ -37,4 +37,6 @@
     <string name="dialog_list_email">Email</string>
     <string name="dialog_list_gmail">Gmail</string>
     <string name="error_activity_not_found">Error. Application not available.</string>
+    <string name="ticker_title">prayerNote Reminder</string>
+    <string name="ticker_content">Prayer from %1$s</string>
 </resources>

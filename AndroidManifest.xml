@@ -18,5 +18,6 @@
         <activity android:name=".PNEditNote"></activity>
         <activity android:name="com.google.ads.AdActivity"
                   android:configChanges="keyboard|keyboardHidden|orientation"/>
+        <receiver android:process=":remote" android:name="PNAlarmReceiver"/>
     </application>
 </manifest>

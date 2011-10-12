@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -63,6 +64,8 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private int mDateCreated;
 	// Stored date note was last prayed
 	private int mDatePrayed;
+	// Last set alarm time, if any
+	private Calendar mAlarmTime;
 	
 	// Cache original values so we can check if any edits have been made later
 	private String mNoteText_Original;
@@ -352,9 +355,23 @@ public class PNEditNote extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch( v.getId() ) {
 		case R.id.edit_note_save:
+			// Set alarm
+			if( mAlarmSetter != null && mAlarmTime != null && mDbRowId != null) {
+				// Create string used for ticker text
+				String textPreFormat = getResources()
+					.getText(R.string.ticker_content).toString();
+				String date = "...";
+				if( mDbAdapter != null )
+					date = mDbAdapter.convertDbDateToString(mDateCreated);
+				String textFinal = String.format(textPreFormat, date);
+				
+				// Set alarm with given time, note id, and ticker text
+				mAlarmSetter.scheduleAlarm(mAlarmTime, mDbRowId, textFinal);
+			}
+			
+			// Save data and exit the Activity
 			saveState();
-			setResult(RESULT_OK);
-			finish();
+			exitActivity();
 			break;
 		case R.id.edit_note_share:
 			startShareActivity();
@@ -637,6 +654,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 * Hide relevant UI and clear alarm
 	 */
 	private void removeAlarm() {
+		// clear the set alarm
+		mAlarmTime = null;
+		
+		// and hide ui
 		if( mAlarmStatus != null )
 			mAlarmStatus.setVisibility(View.GONE);
 		
@@ -711,6 +732,8 @@ public class PNEditNote extends Activity implements OnClickListener {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				if( mAlarmSetter != null ) {
+					mAlarmTime = mAlarmSetter.getAlarmTime();
+					
 					String setTime = mAlarmSetter.getTime();
 					String setDate = mAlarmSetter.getDate();
 					if( setTime!=null && setDate!=null ) {
