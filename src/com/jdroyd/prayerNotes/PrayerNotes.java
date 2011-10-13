@@ -11,6 +11,7 @@ import java.util.Map;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -67,6 +68,13 @@ public class PrayerNotes extends ListActivity {
         mDbAdapter = new PNDbAdapter(this);
         mDbAdapter.open();
         
+        // Receive Search Queries
+		Intent intent = getIntent();
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			Log.v("SEARCH", "query: "+query);
+		}
+        
         // Display any existing data to the ListView
         populateList();
         
@@ -82,7 +90,8 @@ public class PrayerNotes extends ListActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
         	@Override
 			public void onClick(View v) {
-				displayComingSoon();
+				//displayComingSoon();
+        		onSearchRequested();
 			}
         });
         

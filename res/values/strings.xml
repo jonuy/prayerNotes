@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">prayerNotes</string>
-    
+    <string name="search_hint">Search prayerNotes</string>
     <string name="last_prayed_for">Last prayed for:\u0020</string>
     <string name="date_created">Date Created:\u0020</string>
     <string name="date_unknown">Unknown</string>
