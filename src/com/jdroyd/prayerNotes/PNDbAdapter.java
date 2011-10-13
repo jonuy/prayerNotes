@@ -52,6 +52,11 @@ public class PNDbAdapter {
 	private static final String PNKEY_LAST_PRAYED_TYPE = "INTEGER";
 	private static final String PNKEY_LAST_PRAYED_ARGS = "";
 	
+	// Time in milliseconds that alarm is set for
+	public static final String PNKEY_ALARM = "Alarm";
+	private static final String PNKEY_ALARM_TYPE = "INTEGER";
+	private static final String PNKEY_ALARM_ARGS = "";
+	
 	/**
 	 * Database creation sql statement
 	 */
@@ -61,7 +66,8 @@ public class PNDbAdapter {
 		+ PNKEY_NOTE_TEXT + " " + PNKEY_NOTE_TEXT_TYPE + " " + PNKEY_NOTE_TEXT_ARGS + ", "
 		+ PNKEY_NOTE_IMG + " " + PNKEY_NOTE_IMG_TYPE + " " + PNKEY_NOTE_IMG_ARGS + ", "
 		+ PNKEY_DATE_CREATED + " " + PNKEY_DATE_CREATED_TYPE + " " + PNKEY_DATE_CREATED_ARGS + ", "
-		+ PNKEY_LAST_PRAYED + " " + PNKEY_LAST_PRAYED_TYPE + " " + PNKEY_LAST_PRAYED_ARGS
+		+ PNKEY_LAST_PRAYED + " " + PNKEY_LAST_PRAYED_TYPE + " " + PNKEY_LAST_PRAYED_ARGS + ", "
+		+ PNKEY_ALARM + " " + PNKEY_ALARM_TYPE + " " + PNKEY_ALARM_ARGS
 		+ ");";
 	
 	// Name of the database file
@@ -69,7 +75,10 @@ public class PNDbAdapter {
 	
 	// Database version number
 	// onUpgrade() used if Db version is upgraded
-	private static final int PN_DATABASE_VERSION = 2;
+	// ChangeLog:
+	//	v2 = original
+	//	v3 = adding alarm time
+	private static final int PN_DATABASE_VERSION = 3;
 	
 	// Database helper
 	private PNDatabaseHelper mDbHelper;
@@ -154,26 +163,35 @@ public class PNDbAdapter {
 		return strMonths[month];
 	}
 	
-	//TODO:  createNote() with all possible columns for params?
-	// isn't there a design pattern to handle this?  check Effective Java book.
-	public long createNote(String noteText, int dateCreated, String imgFilePath) {
+	/**
+	 * Create new table with initial values
+	 * @param noteText note's main text
+	 * @param dateCreated packed int of the date note was created
+	 * @param imgFilePath file path to the attached image
+	 * @param alarmTime milliseconds of time the alarm was set for; 0 if none set 
+	 * @return row id of the newly inserted row, or -1 if error
+	 */
+	public long createNote(String noteText, int dateCreated, String imgFilePath,
+			long alarmTime) {
 		ContentValues initVal = new ContentValues();
 		initVal.put(PNKEY_NOTE_TEXT, noteText);
 		initVal.put(PNKEY_DATE_CREATED, dateCreated);
 		if(imgFilePath != null)
 			initVal.put(PNKEY_NOTE_IMG, imgFilePath);
+		initVal.put(PNKEY_ALARM, alarmTime);
 		
 		return mDb.insert(PN_DATABASE_TABLE_NAME, null, initVal);
 	}
 
 	// Updates the note in the database for all columns except date created
 	public boolean updateNote(long rowId, String noteText, String imgFilePath, 
-			int dateLastPrayed) {
+			int dateLastPrayed, long alarmTime) {
 		// Not allowing for the date created to be updated
 		ContentValues newVal = new ContentValues();
 		newVal.put(PNKEY_NOTE_TEXT, noteText);
 		newVal.put(PNKEY_NOTE_IMG, imgFilePath);
 		newVal.put(PNKEY_LAST_PRAYED, dateLastPrayed);
+		newVal.put(PNKEY_ALARM, alarmTime);
 		
 		return mDb.update(PN_DATABASE_TABLE_NAME, newVal, 
 				PNKEY_ROWID + " = " + rowId, null) > 0;
@@ -208,7 +226,7 @@ public class PNDbAdapter {
 	public Cursor getAllNotes() {
 		return mDb.query(PN_DATABASE_TABLE_NAME, 
 				new String[] {PNKEY_ROWID, PNKEY_NOTE_TEXT, PNKEY_NOTE_IMG, 
-				PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED}, 
+				PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED, PNKEY_ALARM}, 
 				null, null, null, null, PNKEY_ROWID+" DESC");
 		//ORDER BY _id DESC will place newest notes at top of the list
 	}
@@ -222,7 +240,7 @@ public class PNDbAdapter {
 		Cursor cursor =
 			mDb.query(true, PN_DATABASE_TABLE_NAME, 
 					new String[] {PNKEY_ROWID, PNKEY_NOTE_TEXT, PNKEY_NOTE_IMG, 
-					PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED}, 
+					PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED, PNKEY_ALARM}, 
 					PNKEY_ROWID + " = " + rowId,
 					null, null, null, null, null);
 		

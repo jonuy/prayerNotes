@@ -65,12 +65,13 @@ public class PNEditNote extends Activity implements OnClickListener {
 	// Stored date note was last prayed
 	private int mDatePrayed;
 	// Last set alarm time, if any
-	private Calendar mAlarmTime;
+	private long mAlarmTime;
 	
 	// Cache original values so we can check if any edits have been made later
 	private String mNoteText_Original;
 	private String mImgFilePath_Original;
 	private int mDatePrayed_Original;
+	private long mAlarmTime_Original;
 	
 	// Dialog used to set reminder
 	private PNAlarmSetter mAlarmSetter;
@@ -83,6 +84,28 @@ public class PNEditNote extends Activity implements OnClickListener {
 		
 		mDbAdapter = new PNDbAdapter(this);
 		mDbAdapter.open();
+		
+		// Object to handle setting any alarm reminders
+		mAlarmSetter = new PNAlarmSetter(this);
+		// Setup listener for when dialog is dismissed
+		mAlarmSetter.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			
+			// Update display when dialog is closed
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				if( mAlarmSetter != null ) {
+					// Set alarm time
+					mAlarmTime = mAlarmSetter.getAlarmTime();
+					
+					String setTime = mAlarmSetter.getTimeFromMillis(mAlarmTime);
+					String setDate = mAlarmSetter.getDateFromMillis(mAlarmTime);
+					if( setTime!=null && setDate!=null ) {
+						// if time and date are set, update display
+						displaySetAlarm(setTime, setDate);
+					}
+				}
+			}
+		});
 		
 		mNoteText = (EditText)findViewById(R.id.edit_note_text);
 		mSaveButton = (Button)findViewById(R.id.edit_note_save);
@@ -163,6 +186,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		}
 		mImgFilePath_Original = mImgFilePath;
 		mDatePrayed_Original = mDatePrayed;
+		mAlarmTime_Original = mAlarmTime;
 	}
 	
 	/**
@@ -281,6 +305,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 			return true;
 		}
 		
+		// Check if alarm time set has changed
+		if( mAlarmTime_Original != mAlarmTime )
+			return true;
+		
 		return false;
 	}
 	
@@ -340,6 +368,19 @@ public class PNEditNote extends Activity implements OnClickListener {
 				mDateCreated = note.getInt(
 						note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_DATE_CREATED));
 				
+				// Alarm time
+				mAlarmTime = note.getLong(
+						note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_ALARM));
+				if( mAlarmTime > 0 && mAlarmSetter != null ) {
+					String setTime = mAlarmSetter.getTimeFromMillis(mAlarmTime);
+					String setDate = mAlarmSetter.getDateFromMillis(mAlarmTime);
+					if( setTime!=null && setDate!=null ) {
+						// if time and date are set, update display
+						displaySetAlarm(setTime, setDate);
+					}
+				}
+				
+				
 				// TODO: display field for date created?
 			}
 			else {
@@ -356,17 +397,24 @@ public class PNEditNote extends Activity implements OnClickListener {
 		switch( v.getId() ) {
 		case R.id.edit_note_save:
 			// Only set alarm when saving before leaving
-			if( mAlarmSetter != null && mAlarmTime != null && mDbRowId != null) {
-				// Create string used for ticker text
-				String textPreFormat = getResources()
-					.getText(R.string.ticker_content).toString();
-				String date = "...";
-				if( mDbAdapter != null )
-					date = mDbAdapter.convertDbDateToString(mDateCreated);
-				String textFinal = String.format(textPreFormat, date);
-				
-				// Set alarm with given time, note id, and ticker text
-				mAlarmSetter.scheduleAlarm(mAlarmTime, mDbRowId, textFinal);
+			if( mAlarmSetter != null ){
+				if( mAlarmTime_Original != mAlarmTime && mAlarmTime == 0 ) {
+					// cancel it from the AlarmManager
+					if( mAlarmSetter != null && mDbRowId != null )
+						mAlarmSetter.cancelAlarm(mDbRowId);
+				}
+				else if( mAlarmTime > 0 && mDbRowId != null) {
+					// Create string used for ticker text
+					String textPreFormat = getResources()
+						.getText(R.string.ticker_content).toString();
+					String date = "...";
+					if( mDbAdapter != null )
+						date = mDbAdapter.convertDbDateToString(mDateCreated);
+					String textFinal = String.format(textPreFormat, date);
+					
+					// Set alarm with given time, note id, and ticker text
+					mAlarmSetter.scheduleAlarm(mAlarmTime, mDbRowId, textFinal);
+				}
 			}
 			
 			// Save data and exit the Activity
@@ -395,7 +443,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 			onNoteIsPrayedFor( ((CheckBox)v).isChecked() );
 			break;
 		case R.id.edit_note_alarm_remove:
-			removeAlarm();
+			removeAlarmUI();
 			break;
 		}
 	}
@@ -407,16 +455,18 @@ public class PNEditNote extends Activity implements OnClickListener {
 		if( mDbAdapter != null )
 			mDbAdapter.open();
 		
+		// Text for the note
 		String noteText = mNoteText.getText().toString();
 		
 		if( mDbRowId == null ) {
 			long id = mDbAdapter.createNote(noteText, mDbAdapter.getCurrentDateForDb(), 
-					mImgFilePath);
+					mImgFilePath, mAlarmTime);
 			if( id >= 0 )
 				mDbRowId = id;
 		}
 		else {
-			mDbAdapter.updateNote(mDbRowId, noteText, mImgFilePath, mDatePrayed);
+			mDbAdapter.updateNote(mDbRowId, noteText, mImgFilePath, mDatePrayed,
+					mAlarmTime);
 		}
 	}
 	
@@ -653,13 +703,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 	/**
 	 * Hide relevant UI and clear alarm
 	 */
-	private void removeAlarm() {
+	private void removeAlarmUI() {
 		// clear the set alarm
-		mAlarmTime = null;
-		
-		// cancel it from the AlarmManager
-		if( mAlarmSetter != null && mDbRowId != null )
-			mAlarmSetter.cancelAlarm(mDbRowId);
+		mAlarmTime = 0;
 		
 		// and hide ui
 		if( mAlarmStatus != null )
@@ -729,25 +775,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 * Create dialog box for user to set alarm reminder.
 	 */
 	private Dialog createSetAlarmDialog() {
-		mAlarmSetter = new PNAlarmSetter(this);
-		mAlarmSetter.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			
-			// Update display when dialog is closed
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				if( mAlarmSetter != null ) {
-					// Set alarm time
-					mAlarmTime = mAlarmSetter.getAlarmTime();
-					
-					String setTime = mAlarmSetter.getTime();
-					String setDate = mAlarmSetter.getDate();
-					if( setTime!=null && setDate!=null ) {
-						// if time and date are set, update display
-						displaySetAlarm(setTime, setDate);
-					}
-				}
-			}
-		});
+		mAlarmSetter.initView();
 		return mAlarmSetter;
 	}
 	
