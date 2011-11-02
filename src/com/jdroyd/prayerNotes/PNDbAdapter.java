@@ -226,8 +226,12 @@ public class PNDbAdapter {
 	public Cursor getAllNotes() {
 		return mDb.query(PN_DATABASE_TABLE_NAME, 
 				new String[] {PNKEY_ROWID, PNKEY_NOTE_TEXT, PNKEY_NOTE_IMG, 
-				PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED, PNKEY_ALARM}, 
-				null, null, null, null, PNKEY_ROWID+" DESC");
+					PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED, PNKEY_ALARM}, 
+				null,
+				null,
+				null,
+				null,
+				PNKEY_ROWID+" DESC");
 		//ORDER BY _id DESC will place newest notes at top of the list
 	}
 	
@@ -240,9 +244,37 @@ public class PNDbAdapter {
 		Cursor cursor =
 			mDb.query(true, PN_DATABASE_TABLE_NAME, 
 					new String[] {PNKEY_ROWID, PNKEY_NOTE_TEXT, PNKEY_NOTE_IMG, 
-					PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED, PNKEY_ALARM}, 
+						PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED, PNKEY_ALARM}, 
 					PNKEY_ROWID + " = " + rowId,
-					null, null, null, null, null);
+					null,
+					null,
+					null,
+					null,
+					null);
+		
+		boolean bSuccess = false;
+		if( cursor != null ) {
+			bSuccess = cursor.moveToFirst();
+		}
+		
+		return bSuccess ? cursor : null;
+	}
+	
+	/**
+	 * Gets notes that contain text from the query string
+	 * @param query String to search for
+	 * @return Cursor for matching rows in the database, otherwise null.
+	 */
+	public Cursor getNotesWithText(String query) {
+		Cursor cursor = 
+			mDb.query(PN_DATABASE_TABLE_NAME,
+					new String[] {PNKEY_ROWID, PNKEY_NOTE_TEXT, PNKEY_NOTE_IMG, 
+						PNKEY_DATE_CREATED, PNKEY_LAST_PRAYED, PNKEY_ALARM},
+					PNKEY_NOTE_TEXT + " LIKE " + "'%"+query+"%'",
+					null,
+					null,
+					null,
+					PNKEY_ROWID+" DESC");
 		
 		boolean bSuccess = false;
 		if( cursor != null ) {

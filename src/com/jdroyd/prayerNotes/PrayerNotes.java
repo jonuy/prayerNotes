@@ -69,14 +69,15 @@ public class PrayerNotes extends ListActivity {
         mDbAdapter.open();
         
         // Receive Search Queries
+        String query = null;
 		Intent intent = getIntent();
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			String query = intent.getStringExtra(SearchManager.QUERY);
+			query = intent.getStringExtra(SearchManager.QUERY);
 			Log.v("SEARCH", "query: "+query);
 		}
         
         // Display any existing data to the ListView
-        populateList();
+		populateList(query);
         
         // Setup click listener for the buttons
         Button addButton = (Button)findViewById(R.id.main_button_add);
@@ -90,7 +91,6 @@ public class PrayerNotes extends ListActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
         	@Override
 			public void onClick(View v) {
-				//displayComingSoon();
         		onSearchRequested();
 			}
         });
@@ -146,21 +146,41 @@ public class PrayerNotes extends ListActivity {
     	startActivityForResult(i, ACTIVITY_EDIT);
     }
     
+    /**
+     * Called when another Activity launched by this application exits
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
     	super.onActivityResult(requestCode, resultCode, intent);
     	
-    	populateList();
+    	// Beacuse we're returning from another Activity, database was likely
+    	// closed by onPause(), and so needs to be re-opened
+    	if( mDbAdapter != null )
+    		mDbAdapter.open();
+    	
+    	populateList(null);
     }
     
     /**
      * Retrieves data from the database and sets it to display in the ListView
+     * @param query String to filter notes with.  If null, then will display all notes
      */
-    private void populateList() {
-    	// Get all of the rows from the database
+    private void populateList(String query) {
     	// TODO: should only get the 10 or 20 most recent
     	// TODO: notes that aren't marked as prayed-for should go first
-    	Cursor notesCursor = mDbAdapter.getAllNotes();
+    	
+    	Cursor notesCursor = null;
+    	// Get all of the rows from the database
+    	if( query == null ) {
+    		Log.v("QUERY","query = null");
+    		notesCursor = mDbAdapter.getAllNotes();
+    	}
+    	// If query string is provided, then display only matching notes
+    	else {
+    		Log.v("QUERY","query = ["+query+"]");
+    		notesCursor = mDbAdapter.getNotesWithText(query);
+    	}
+    	
     	startManagingCursor(notesCursor);
     	
     	ArrayList <HashMap<String,Object>> noteList = 
@@ -401,7 +421,7 @@ public class PrayerNotes extends ListActivity {
 		    		Toast.makeText(this, R.string.context_prayed_success, Toast.LENGTH_LONG)
 		    			 .show();
 		    		// refresh ListView
-		    		populateList();
+		    		populateList(null);
 	    		}
 	    		return true;
 	    	case CONTEXT_OPEN_ID:
@@ -429,7 +449,7 @@ public class PrayerNotes extends ListActivity {
 							// Reset value if row was successfully deleted
 							mRowIdToDelete = null;
 							// Repopulate list since row's been deleted
-							populateList();
+							populateList(null);
 						}
 					}
 				}
@@ -457,5 +477,16 @@ public class PrayerNotes extends ListActivity {
 		}
 
 		return super.onCreateDialog(id);
+	}
+	
+	/**
+	 *  Called when the Activity ends
+	 */
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		if( mDbAdapter != null )
+			mDbAdapter.close();
 	}
 }
