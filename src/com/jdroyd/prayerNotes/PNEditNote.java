@@ -31,16 +31,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class PNEditNote extends Activity implements OnClickListener {
-
-	//TODO: move to file with all the constants?
-	public static final int ACTIVITY_IMG_GALLERY = 3;
-	public static final int ACTIVITY_SHARE = 4;
-	
-	private static final int DIALOG_DELETE_NOTE = 0;
-	private static final int DIALOG_CANCEL_EDIT = 1;
-	private static final int DIALOG_SET_ALARM = 2;
-	
-	private static final int MENU_CANCEL_ID = 0;
 	
 	private PNDbAdapter mDbAdapter;
 	private EditText mNoteText;
@@ -203,7 +193,7 @@ public class PNEditNote extends Activity implements OnClickListener {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	super.onCreateOptionsMenu(menu);
-    	menu.add(0, MENU_CANCEL_ID, 0, R.string.edit_menu_cancel);
+    	menu.add(0, Constants.MENU_CANCEL_ID, 0, R.string.edit_menu_cancel);
     	return true;
     }
     
@@ -213,7 +203,7 @@ public class PNEditNote extends Activity implements OnClickListener {
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
     	switch( item.getItemId() ) {
-    	case MENU_CANCEL_ID:
+    	case Constants.MENU_CANCEL_ID:
     		cancelActivityRequest();
     		return true;
     	}
@@ -253,7 +243,7 @@ public class PNEditNote extends Activity implements OnClickListener {
     private void cancelActivityRequest() {
     	if( isNoteChanged() ) {
     		// Confirm player wants to abandon changes before exiting
-    		showDialog(DIALOG_CANCEL_EDIT);
+    		showDialog(Constants.DIALOG_CANCEL_EDIT);
     	}
     	else {
     		exitActivity();
@@ -428,10 +418,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 			if( isNewNote() )
 				exitActivity();
 			else
-				showDialog(DIALOG_DELETE_NOTE);
+				showDialog(Constants.DIALOG_DELETE_NOTE);
 			break;
 		case R.id.edit_note_alarm:
-			showDialog(DIALOG_SET_ALARM);
+			showDialog(Constants.DIALOG_SET_ALARM);
 			break;
 		case R.id.edit_note_img:
 			startGalleryActivity();
@@ -477,7 +467,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		Intent i = new Intent(Intent.ACTION_PICK,
 				MediaStore.Images.Media.EXTERNAL_CONTENT_URI); //or INTERNAL_CONTENT_URI?
 		i.setType("image/*");
-		startActivityForResult(i, ACTIVITY_IMG_GALLERY);
+		startActivityForResult(i, Constants.ACTIVITY_IMG_GALLERY);
 	}
 	
 	/**
@@ -515,7 +505,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		// Use createChooser() to allow user to select application
 		Intent chooser = Intent.createChooser(i, 
 				getResources().getText(R.string.dialog_share_title));
-		startActivityForResult(chooser, ACTIVITY_SHARE);
+		startActivityForResult(chooser, Constants.ACTIVITY_SHARE);
 	}
 	
 	/**
@@ -526,7 +516,7 @@ public class PNEditNote extends Activity implements OnClickListener {
     	super.onActivityResult(requestCode, resultCode, intent);
     	
     	switch( requestCode ) {
-    	case ACTIVITY_IMG_GALLERY:
+    	case Constants.ACTIVITY_IMG_GALLERY:
     		if(resultCode == RESULT_OK) {
     			Uri selectedImage = intent.getData();
 				String[] filePathColumn = {MediaStore.Images.Media.DATA};
@@ -547,7 +537,7 @@ public class PNEditNote extends Activity implements OnClickListener {
     			Log.w("PN", "ACTIVITY_IMG_GALLERY returned: "+resultCode);
     		}
     		break;
-    	case ACTIVITY_SHARE:
+    	case Constants.ACTIVITY_SHARE:
     		if( resultCode == RESULT_OK)
     			Log.v("PN", "share activity OK");
     		else
@@ -785,11 +775,11 @@ public class PNEditNote extends Activity implements OnClickListener {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch(id) {
-		case DIALOG_DELETE_NOTE:
+		case Constants.DIALOG_DELETE_NOTE:
 			return createDeleteDialog();
-		case DIALOG_CANCEL_EDIT:
+		case Constants.DIALOG_CANCEL_EDIT:
 			return createCancelEditDialog();
-		case DIALOG_SET_ALARM:
+		case Constants.DIALOG_SET_ALARM:
 			return createSetAlarmDialog();
 		}
 

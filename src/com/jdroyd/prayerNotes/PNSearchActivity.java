@@ -21,9 +21,6 @@ import android.widget.ListView;
 
 public class PNSearchActivity extends ListActivity {
 	
-	//TODO: temp here.  will move to utility class later.
-	public static final int ACTIVITY_EDIT = 1;
-	
 	// Database handle
 	private PNDbAdapter mDbAdapter;
 	
@@ -119,7 +116,7 @@ public class PNSearchActivity extends ListActivity {
     	Intent i = new Intent(this, PNEditNote.class);
     	i.putExtra(PNDbAdapter.PNKEY_ROWID, position);
     	
-    	startActivityForResult(i, ACTIVITY_EDIT);
+    	startActivityForResult(i, Constants.ACTIVITY_EDIT);
     }
     
     

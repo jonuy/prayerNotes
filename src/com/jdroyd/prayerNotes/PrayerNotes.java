@@ -21,16 +21,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class PrayerNotes extends ListActivity {
 	
-	//TODO: make this an enum?  place in constants file?
-	public static final int ACTIVITY_CREATE = 0;
-	public static final int ACTIVITY_EDIT = 1;
-	
-	public static final int CONTEXT_DELETE_ID = 0;
-	public static final int CONTEXT_PRAYED_ID = 1;
-	public static final int CONTEXT_OPEN_ID = 2;
-	
-	private static final int DIALOG_DELETE_NOTE = 0;
-	
 	//
 	private PNDbAdapter mDbAdapter;
 	
@@ -110,7 +100,7 @@ public class PrayerNotes extends ListActivity {
      */
     private void createPrayerNote() {
     	Intent i = new Intent(this, PNEditNote.class);
-    	startActivityForResult(i, ACTIVITY_CREATE);
+    	startActivityForResult(i, Constants.ACTIVITY_CREATE);
     }
     
     /**
@@ -121,7 +111,7 @@ public class PrayerNotes extends ListActivity {
     	Intent i = new Intent(this, PNEditNote.class);
     	i.putExtra(PNDbAdapter.PNKEY_ROWID, position);
     	
-    	startActivityForResult(i, ACTIVITY_EDIT);
+    	startActivityForResult(i, Constants.ACTIVITY_EDIT);
     }
     
     /**
@@ -263,9 +253,9 @@ public class PrayerNotes extends ListActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,
     		ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
-    	menu.add(0, CONTEXT_OPEN_ID, 0, R.string.context_menu_open);
-    	menu.add(0, CONTEXT_PRAYED_ID, 0, R.string.context_menu_prayed);
-    	menu.add(0, CONTEXT_DELETE_ID, 0, R.string.context_menu_delete);
+    	menu.add(0, Constants.CONTEXT_OPEN_ID, 0, R.string.context_menu_open);
+    	menu.add(0, Constants.CONTEXT_PRAYED_ID, 0, R.string.context_menu_prayed);
+    	menu.add(0, Constants.CONTEXT_DELETE_ID, 0, R.string.context_menu_delete);
     }
     
     @Override
@@ -277,12 +267,12 @@ public class PrayerNotes extends ListActivity {
     	
     	if( rowId != null ) {
 	    	switch(item.getItemId()) {
-	    	case CONTEXT_DELETE_ID:
+	    	case Constants.CONTEXT_DELETE_ID:
 	    		// Set row id for dialog to delete
 				mRowIdToDelete = rowId;
-	    		showDialog(DIALOG_DELETE_NOTE);
+	    		showDialog(Constants.DIALOG_DELETE_NOTE);
 	    		return true;
-	    	case CONTEXT_PRAYED_ID:
+	    	case Constants.CONTEXT_PRAYED_ID:
 	    		if( mDbAdapter != null ) {
 		    		// Get current time and save to database
 		    		mDbAdapter.updateNote(rowId, mDbAdapter.getCurrentDateForDb());
@@ -293,7 +283,7 @@ public class PrayerNotes extends ListActivity {
 		    		populateList();
 	    		}
 	    		return true;
-	    	case CONTEXT_OPEN_ID:
+	    	case Constants.CONTEXT_OPEN_ID:
 	    		editPrayerNote(rowId);
 	    		return true;
 	    	}
@@ -341,7 +331,7 @@ public class PrayerNotes extends ListActivity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch(id) {
-		case DIALOG_DELETE_NOTE:
+		case Constants.DIALOG_DELETE_NOTE:
 			return createDeleteDialog();
 		}
 
