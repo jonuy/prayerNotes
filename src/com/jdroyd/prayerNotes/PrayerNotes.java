@@ -1,35 +1,21 @@
 package com.jdroyd.prayerNotes;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
@@ -68,16 +54,8 @@ public class PrayerNotes extends ListActivity {
         mDbAdapter = new PNDbAdapter(this);
         mDbAdapter.open();
         
-        // Receive Search Queries
-        String query = null;
-		Intent intent = getIntent();
-		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			query = intent.getStringExtra(SearchManager.QUERY);
-			Log.v("SEARCH", "query: "+query);
-		}
-        
         // Display any existing data to the ListView
-		populateList(query);
+		populateList();
         
         // Setup click listener for the buttons
         Button addButton = (Button)findViewById(R.id.main_button_add);
@@ -158,28 +136,17 @@ public class PrayerNotes extends ListActivity {
     	if( mDbAdapter != null )
     		mDbAdapter.open();
     	
-    	populateList(null);
+    	populateList();
     }
     
     /**
      * Retrieves data from the database and sets it to display in the ListView
-     * @param query String to filter notes with.  If null, then will display all notes
      */
-    private void populateList(String query) {
+    private void populateList() {
     	// TODO: should only get the 10 or 20 most recent
-    	// TODO: notes that aren't marked as prayed-for should go first
     	
     	Cursor notesCursor = null;
-    	// Get all of the rows from the database
-    	if( query == null ) {
-    		Log.v("QUERY","query = null");
-    		notesCursor = mDbAdapter.getAllNotes();
-    	}
-    	// If query string is provided, then display only matching notes
-    	else {
-    		Log.v("QUERY","query = ["+query+"]");
-    		notesCursor = mDbAdapter.getNotesWithText(query);
-    	}
+    	notesCursor = mDbAdapter.getAllNotes();
     	
     	startManagingCursor(notesCursor);
     	
@@ -200,8 +167,6 @@ public class PrayerNotes extends ListActivity {
 	    					notesCursor.getColumnIndexOrThrow(PNDbAdapter.PNKEY_DATE_CREATED) );
 	    			int lastPrayed = notesCursor.getInt( 
 	    					notesCursor.getColumnIndexOrThrow(PNDbAdapter.PNKEY_LAST_PRAYED) );
-	    			
-	    			int pos = notesCursor.getPosition();
 	    			
 	    			HashMap<String,Object> noteHash = new HashMap<String,Object>();
 	    			
@@ -290,102 +255,6 @@ public class PrayerNotes extends ListActivity {
     	ListView lv = getListView();
     	lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     }
-
-	////////////////////////////////////////////////////////////////////////////
-    // PNViewAdapter
-    //   Custom adapter used to display the info in the main ListView
-    ////////////////////////////////////////////////////////////////////////////
-    private class PNViewAdapter extends SimpleAdapter {
-
-		public PNViewAdapter(Context context,
-				List<? extends Map<String, ?>> data, int resource,
-				String[] from, int[] to) {
-			super(context, data, resource, from, to);
-		}
-		
-		@Override
-		public void setViewImage(ImageView v, int value) {
-			super.setViewImage(v, value);
-			
-			if(v.getId() == R.id.main_note_row_img) {
-				if( value > 0 )
-					v.setVisibility(View.VISIBLE);
-				else
-					v.setVisibility(View.GONE);
-			}
-		}
-		
-		@Override
-		public void setViewImage(ImageView v, String value) {
-			// Consume setViewImage if value is an empty string, otherwise
-			// super tries to evaluate it as a file path and throws errors
-			if( value != "" ) {
-				// Instead of simply using super.setViewImage(), we decode the file
-				// first to a smaller sample size that will use less memory and
-				// hopefully prevent us from seeing the OOM crash for large images
-				int req_size = 0;
-				if( v != null ) {
-					LayoutParams frame = v.getLayoutParams();
-					int w = frame.width;
-					int h = frame.height;
-					req_size = w > h ? w : h;
-				}
-				v.setImageBitmap(decodeFile(value, req_size));
-				
-				if(v.getId() == R.id.main_note_row_img) {
-					v.setVisibility(View.VISIBLE);
-				}
-			}
-			else {
-				if(v.getId() == R.id.main_note_row_img) {
-					v.setVisibility(View.GONE);
-				}
-			}
-		}
-
-		@Override
-		public void setViewText(TextView v, String text) {
-			super.setViewText(v, text);
-		}
-		
-		/**
-		 * Returns a Bitmap that's a subsample of the original image.  Allows
-		 * us to retrieve an image that requires less memory and can help us
-		 * avoid the OOM exceptions.
-		 */
-		private Bitmap decodeFile(String filePath, int req_size){
-			Bitmap img = null;
-			try {
-				// Decode image size
-				BitmapFactory.Options o = new BitmapFactory.Options();
-				o.inJustDecodeBounds = true;
-			
-				FileInputStream fis = new FileInputStream(filePath);
-				BitmapFactory.decodeStream(fis, null, o);
-				fis.close();
-
-				int scale = 1;
-				if (o.outHeight > req_size || o.outWidth > req_size) {
-					scale = (int)Math.pow(2, (int) Math.round(Math.log(req_size 
-							/ (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
-				}
-			
-				// Decode with inSampleSize
-				BitmapFactory.Options o2 = new BitmapFactory.Options();
-				o2.inSampleSize = scale;
-				fis = new FileInputStream(filePath);
-				img = BitmapFactory.decodeStream(fis, null, o2);
-				fis.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				Log.e("PN", "Image file not found during decoding: "+filePath);
-			} catch (IOException e) {
-				e.printStackTrace();
-				Log.e("PN", "Image IOException during decoding: "+filePath);
-			}
-			return img;
-		}
-    }
     
     ////////////////////////////////////////////////////////////////////////////
     // Context menu function overrides
@@ -421,7 +290,7 @@ public class PrayerNotes extends ListActivity {
 		    		Toast.makeText(this, R.string.context_prayed_success, Toast.LENGTH_LONG)
 		    			 .show();
 		    		// refresh ListView
-		    		populateList(null);
+		    		populateList();
 	    		}
 	    		return true;
 	    	case CONTEXT_OPEN_ID:
@@ -449,7 +318,7 @@ public class PrayerNotes extends ListActivity {
 							// Reset value if row was successfully deleted
 							mRowIdToDelete = null;
 							// Repopulate list since row's been deleted
-							populateList(null);
+							populateList();
 						}
 					}
 				}

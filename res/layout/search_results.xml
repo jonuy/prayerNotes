@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+	<!-- ListView to display search results -->
+	<ListView android:id="@+id/android:list"
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:fadeScrollbars="true">
+	</ListView>
+	<!-- Text to show if search results come up empty -->
+	<TextView android:id="@+id/android:empty"
+		android:text="@string/search_empty"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		/>
+</LinearLayout>
