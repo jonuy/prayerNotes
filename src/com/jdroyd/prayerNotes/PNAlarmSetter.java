@@ -24,6 +24,8 @@ import android.widget.TimePicker;
  * set alarm, set time for it, repeating reminders, displaying UI dialogs
  */
 public class PNAlarmSetter extends Dialog implements OnClickListener {
+	// Logging tag
+	private static final String TAG = "PNAlarmSetter";
 	
 	private static final String AM = "AM";
 	private static final String PM = "PM";
@@ -77,7 +79,7 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 		mHour = cal.get(Calendar.HOUR);
 		mMinute = cal.get(Calendar.MINUTE);
 		mAM_PM = cal.get(Calendar.AM_PM);
-		Log.v("ALARM", mHour+":"+mMinute+" "+mAM_PM);
+		Log.v(TAG, mHour+":"+mMinute+" "+mAM_PM);
 		
 		mMonth = cal.get(Calendar.MONTH);
 		mDay = cal.get(Calendar.DATE);
@@ -246,7 +248,7 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 			
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-				Log.v("ALARM", "time set: "+hourOfDay+":"+minute);
+				Log.v(TAG, "time set: "+hourOfDay+":"+minute);
 				if( hourOfDay >= 12 ) {
 					mHour = hourOfDay - 12;
 					mAM_PM = Calendar.PM;
@@ -294,7 +296,7 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 			// Debug text
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(time);
-			Log.v("ALARM", "SETTING ALARM FOR: note="+position+" @ time="+cal.getTime().toString());
+			Log.v(TAG, "SETTING ALARM FOR: note="+position+" @ time="+cal.getTime().toString());
 		}
 	}
 	
@@ -316,7 +318,7 @@ public class PNAlarmSetter extends Dialog implements OnClickListener {
 			AlarmManager am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 			am.cancel(sender);
 			
-			Log.v("ALARM", "CANCELING ALARM FOR: note="+position);
+			Log.v(TAG, "CANCELING ALARM FOR: note="+position);
 		}
 	}
 }

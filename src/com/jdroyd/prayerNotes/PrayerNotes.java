@@ -22,8 +22,10 @@ import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class PrayerNotes extends ListActivity {
+	// Logging tag
+	private static final String TAG = "PrayerNotes";
 	
-	//
+	// Handle to database
 	private PNDbAdapter mDbAdapter;
 	
 	// Row id of note to delete
@@ -40,7 +42,7 @@ public class PrayerNotes extends ListActivity {
         
         ////// DEV DELETE DATABASE //////
         //boolean deleteResult = this.deleteDatabase(PNDbAdapter.PN_DATABASE_FILE_NAME);
-        //Log.v("PN", "Database delete result: "+deleteResult);
+        //Log.v(TAG, "Database delete result: "+deleteResult);
         /////////////////////////////////
         
         mDbAdapter = new PNDbAdapter(this);
@@ -226,7 +228,7 @@ public class PrayerNotes extends ListActivity {
 			String noteImg = (String)hash.get(PNDbAdapter.PNKEY_NOTE_IMG);
 			String dateCreated = (String)hash.get(PNDbAdapter.PNKEY_DATE_CREATED);
 			String lastPrayed = (String)hash.get(PNDbAdapter.PNKEY_LAST_PRAYED);
-	    	Log.v("SORT","noteId="+noteId+" / noteText:"
+	    	Log.v(TAG,"noteId="+noteId+" / noteText:"
 					+noteText+" / noteImg:"+noteImg+" / dateCreated:"
 					+dateCreated+" / lastPrayed:"+lastPrayed);
     	}*/

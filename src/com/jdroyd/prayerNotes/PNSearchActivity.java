@@ -20,6 +20,8 @@ import android.view.View;
 import android.widget.ListView;
 
 public class PNSearchActivity extends ListActivity {
+	// Logging tag
+	private static final String TAG = "PNSearchActivity";
 	
 	// Database handle
 	private PNDbAdapter mDbAdapter;
@@ -33,7 +35,7 @@ public class PNSearchActivity extends ListActivity {
 		setContentView(R.layout.search_results);
 		setTitle(R.string.app_name);
 		
-		Log.v("SEARCH", "PNSearchActivity.onCreate()");
+		Log.v(TAG, "PNSearchActivity.onCreate()");
 		
 		mDbAdapter = new PNDbAdapter(this);
         mDbAdapter.open();
@@ -50,7 +52,7 @@ public class PNSearchActivity extends ListActivity {
 	 */
 	@Override
 	protected void onNewIntent(Intent intent) {
-		Log.v("SEARCH", "PNSearchActivity.onNewIntent()");
+		Log.v(TAG, "PNSearchActivity.onNewIntent()");
 		
 	    setIntent(intent);
 	    handleIntent(intent);
@@ -65,7 +67,7 @@ public class PNSearchActivity extends ListActivity {
 		String query = null;
 		if( Intent.ACTION_SEARCH.equals(intent.getAction()) ) {
 			query = intent.getStringExtra(SearchManager.QUERY);
-			Log.v("SEARCH", "query: "+query);
+			Log.v(TAG, "query: "+query);
 		}
 		
 		// Display any results to the list
@@ -127,12 +129,12 @@ public class PNSearchActivity extends ListActivity {
     private void populateList(String query) {
     	Cursor notesCursor = null;
     	if( query == null ) {
-    		Log.v("ERROR","query = null");
+    		Log.e(TAG,"query = null");
     		return;
     	}
     	// If query string is provided, then display only matching notes
     	else {
-    		Log.v("QUERY","query = ["+query+"]");
+    		Log.v(TAG,"query = ["+query+"]");
     		notesCursor = mDbAdapter.getNotesWithText(query);
     	}
     	

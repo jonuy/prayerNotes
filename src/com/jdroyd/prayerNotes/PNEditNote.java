@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class PNEditNote extends Activity implements OnClickListener {
+	// Logging tag
+	private static final String TAG = "PNEditNote";
 	
 	private PNDbAdapter mDbAdapter;
 	private EditText mNoteText;
@@ -124,10 +126,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 		if( mDbRowId == null ) {
 			Bundle extras = getIntent().getExtras();
 			mDbRowId = (extras==null) ? null : extras.getLong(PNDbAdapter.PNKEY_ROWID);
-			Log.v("SAVE", "row id from Intent:"+mDbRowId);
+			Log.v(TAG, "row id from Intent:"+mDbRowId);
 		}
 		else
-			Log.v("SAVE", "row id from Bundle:"+mDbRowId);
+			Log.v(TAG, "row id from Bundle:"+mDbRowId);
 		
 		// Setup initial UI for the Activity, handling special cases
 		initUI();
@@ -529,19 +531,19 @@ public class PNEditNote extends Activity implements OnClickListener {
 				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 				mImgFilePath = cursor.getString(columnIndex);
 				
-				Log.v("PN", "Selected image file path: "+mImgFilePath);
+				Log.v(TAG, "Selected image file path: "+mImgFilePath);
 				
 				setNoteImageToView(mImgFilePath);
     		}
     		else {
-    			Log.w("PN", "ACTIVITY_IMG_GALLERY returned: "+resultCode);
+    			Log.w(TAG, "ACTIVITY_IMG_GALLERY returned: "+resultCode);
     		}
     		break;
     	case Constants.ACTIVITY_SHARE:
     		if( resultCode == RESULT_OK)
-    			Log.v("PN", "share activity OK");
+    			Log.v(TAG, "share activity OK");
     		else
-    			Log.v("PN", "share not ok: "+resultCode);
+    			Log.v(TAG, "share not ok: "+resultCode);
     		break;
     	}
     }
@@ -813,7 +815,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		Log.v("SAVE", "onSaveInstanceState - mDbRowId="+mDbRowId);
+		Log.v(TAG, "onSaveInstanceState - mDbRowId="+mDbRowId);
 		outState.putSerializable(PNDbAdapter.PNKEY_ROWID, mDbRowId);
 	}
 }

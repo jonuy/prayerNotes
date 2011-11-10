@@ -23,6 +23,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class PNViewAdapter extends SimpleAdapter {
+	// Logging tag
+	private static final String TAG = "PNViewAdapter";
 	
 	public PNViewAdapter(Context context,
 			List<? extends Map<String, ?>> data, int resource,
@@ -105,10 +107,10 @@ public class PNViewAdapter extends SimpleAdapter {
 			fis.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			Log.e("PN", "Image file not found during decoding: "+filePath);
+			Log.e(TAG, "Image file not found during decoding: "+filePath);
 		} catch (IOException e) {
 			e.printStackTrace();
-			Log.e("PN", "Image IOException during decoding: "+filePath);
+			Log.e(TAG, "Image IOException during decoding: "+filePath);
 		}
 		return img;
 	}

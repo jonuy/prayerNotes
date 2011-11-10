@@ -22,12 +22,24 @@
 			  	android:src="@drawable/ic_new_note_holodark"
 			  	android:background="@null"
 			  	/>
+			  <View android:id="@+id/main_banner_separator_0"
+			  	android:layout_toLeftOf="@id/main_button_add"
+			  	android:layout_width="1dp"
+			  	android:layout_height="36dp"
+			  	android:background="#FFFFFFFF"
+			  	/>
 			  <ImageButton android:id="@+id/main_button_search"
 			  	android:layout_width="36dp"
 			  	android:layout_height="36dp"
-			  	android:layout_toLeftOf="@id/main_button_add"
+			  	android:layout_toLeftOf="@id/main_banner_separator_0"
 			  	android:src="@drawable/ic_menu_search_holodark"
 			  	android:background="@null"
+			  	/>
+			  <View android:id="@+id/main_banner_separator_1"
+			  	android:layout_toLeftOf="@id/main_button_search"
+			  	android:layout_width="1dp"
+			  	android:layout_height="36dp"
+			  	android:background="#FFFFFFFF"
 			  	/>
     </RelativeLayout>
     <!-- Horizontal line.

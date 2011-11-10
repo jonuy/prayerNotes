@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class PNAlarmReceiver extends BroadcastReceiver {
+	// Logging tag
+	private static final String TAG = "PNAlarmReceiver";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -36,7 +38,7 @@ public class PNAlarmReceiver extends BroadcastReceiver {
 					CharSequence contentText = bundle.getCharSequence("content_text");
 					CharSequence contentTitle = tickerText;
 					
-					Log.v("ALARM", "Recv position: "+position);
+					Log.v(TAG, "Recv position: "+position);
 					Intent notificationIntent = new Intent(ctx, PNEditNote.class);
 					notificationIntent.putExtra(PNDbAdapter.PNKEY_ROWID, position);
 					PendingIntent contentIntent = PendingIntent.getActivity(
@@ -47,13 +49,13 @@ public class PNAlarmReceiver extends BroadcastReceiver {
 					nm.notify(1, notification);
 				}
 				else
-					Log.v("ERROR", "Failed to create NotificationManager");
+					Log.e(TAG, "Failed to create NotificationManager");
 			}
 			else
-				Log.v("ERROR", "Alarm received with a null context");
+				Log.e(TAG, "Alarm received with a null context");
 		}
 		catch( Exception e ) {
-			Log.v("ERROR", "Error received in PNAlarmReceiver: "+e);
+			Log.e(TAG, "Error received in PNAlarmReceiver: "+e);
 		}
 	}
 

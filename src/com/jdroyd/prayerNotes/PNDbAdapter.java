@@ -17,7 +17,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class PNDbAdapter {
-
+	// Logging tag
+	private static final String TAG = "PNDbAdapter";
+	
 	// Database table name
 	private static final String PN_DATABASE_TABLE_NAME = "prayerNotesDb";
 	
@@ -102,7 +104,7 @@ public class PNDbAdapter {
 	 * 
 	 */
 	public PNDbAdapter open() throws SQLException {
-		Log.v("PNDbAdapter", "open()");
+		Log.v(TAG, "open()");
 		if( mDbHelper == null) {
 			mDbHelper = new PNDatabaseHelper(mContext);
 		}
@@ -114,7 +116,7 @@ public class PNDbAdapter {
 	 * 
 	 */
 	public void close() {
-		Log.v("PNDbAdapter", "close()");
+		Log.v(TAG, "close()");
 		mDbHelper.close();
 	}
 	
