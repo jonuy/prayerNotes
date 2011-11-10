@@ -15,30 +15,38 @@
 			    android:layout_alignParentLeft="true"
 			    android:text="@string/app_name"
 			    />
-			  <!-- ToDo: change to ImageButton when icons are ready -->
-			  <Button android:id="@+id/main_button_add"
-			  	android:layout_width="wrap_content"
-			  	android:layout_height="wrap_content"
+			  <ImageButton android:id="@+id/main_button_add"
+			  	android:layout_width="36dp"
+			  	android:layout_height="36dp"
 			  	android:layout_alignParentRight="true"
-			  	android:text="ADD"
+			  	android:src="@drawable/ic_new_note_holodark"
+			  	android:background="@null"
 			  	/>
-			  <Button android:id="@+id/main_button_search"
-			  	android:layout_width="wrap_content"
-			  	android:layout_height="wrap_content"
+			  <ImageButton android:id="@+id/main_button_search"
+			  	android:layout_width="36dp"
+			  	android:layout_height="36dp"
 			  	android:layout_toLeftOf="@id/main_button_add"
-			  	android:text="SRCH"
+			  	android:src="@drawable/ic_menu_search_holodark"
+			  	android:background="@null"
 			  	/>
     </RelativeLayout>
+    <!-- Horizontal line.
+    	 TODO: is there a better way?  Does this bloat the layout? -->
+    <View android:id="@+id/main_div_banner"
+    	android:layout_below="@id/main_banner"
+    	android:layout_width="fill_parent"
+		android:layout_height="1dp"
+		android:background="#FFFFFFFF" />
     <!-- ListView used when data is present -->
     <ListView android:id="@+id/android:list"
-    	android:layout_below="@id/main_banner"
+    	android:layout_below="@id/main_div_banner"
     	android:layout_width="fill_parent"
     	android:layout_height="fill_parent"
     	android:fadeScrollbars="true"
     	/>
     <!-- Optional view if no data is present for the list -->
     <TextView android:id="@+id/android:empty"
-    	android:layout_below="@id/main_banner"
+    	android:layout_below="@id/main_div_banner"
     	android:text="@string/main_list_empty"
     	android:layout_width="wrap_content"
     	android:layout_height="wrap_content"

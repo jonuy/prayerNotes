@@ -11,10 +11,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -48,14 +50,14 @@ public class PrayerNotes extends ListActivity {
 		populateList();
         
         // Setup click listener for the buttons
-        Button addButton = (Button)findViewById(R.id.main_button_add);
+        ImageButton addButton = (ImageButton)findViewById(R.id.main_button_add);
         addButton.setOnClickListener(new View.OnClickListener() {        	
         	@Override
         	public void onClick(View view) {
         		createPrayerNote();
         	}
         });
-        Button searchButton = (Button)findViewById(R.id.main_button_search);
+        ImageButton searchButton = (ImageButton)findViewById(R.id.main_button_search);
         searchButton.setOnClickListener(new View.OnClickListener() {
         	@Override
 			public void onClick(View v) {
@@ -244,6 +246,37 @@ public class PrayerNotes extends ListActivity {
     	
     	ListView lv = getListView();
     	lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Options/Action Menu  ...  Action Bar only available at SDK 3.0+
+    ////////////////////////////////////////////////////////////////////////////
+    /**
+     * System calls this to create the options menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+    
+    /**
+     * Handle option menu item selection
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.main_button_add:
+            displayComingSoon();
+            return true;
+        case R.id.main_button_search:
+            displayComingSoon();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
     }
     
     ////////////////////////////////////////////////////////////////////////////
