@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/main_button_add"
           android:icon="@drawable/ic_new_note_holodark"
-          android:title="ADD" />
+          android:title="ADD"/>
     <item android:id="@+id/main_button_search"
           android:icon="@drawable/ic_menu_search_holodark"
           android:title="SEARCH"/>

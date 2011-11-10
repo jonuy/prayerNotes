@@ -86,7 +86,7 @@ public final class R {
         public static final int edit_discard_button=0x7f05001a;
         public static final int edit_menu_cancel=0x7f05001f;
         public static final int edit_note_img_title=0x7f05001e;
-        public static final int edit_note_text_title=0x7f05001d;
+        public static final int edit_note_text_hint=0x7f05001d;
         public static final int edit_note_title=0x7f050018;
         public static final int edit_save_button=0x7f050019;
         public static final int edit_share_button=0x7f05001c;

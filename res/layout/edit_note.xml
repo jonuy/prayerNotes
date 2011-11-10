@@ -30,11 +30,8 @@
 			android:visibility="invisible"/>
 	</RelativeLayout>
 	
-	<TextView
-		android:text="@string/edit_note_text_title"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"/>
 	<EditText android:id="@+id/edit_note_text"
+		android:hint="@string/edit_note_text_hint"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:minLines="4"

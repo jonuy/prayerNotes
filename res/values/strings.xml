@@ -29,7 +29,7 @@
     <string name="edit_discard_button">Discard</string>
     <string name="edit_delete_button">Delete</string>
     <string name="edit_share_button">Share</string>
-    <string name="edit_note_text_title">Edit prayerNote:</string>
+    <string name="edit_note_text_hint">What\'s your prayer?</string>
     <string name="edit_note_img_title">Attach an image:</string>
     <string name="edit_menu_cancel">Cancel</string>
     <string name="error_activity_not_found">Error. Application not available.</string>
