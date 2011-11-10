@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,6 +26,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,9 +39,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private Long mDbRowId;
 	
 	// Handles to UI elements
-	private Button mSaveButton;
+	private ImageButton mCancelButton;
+	private ImageButton mSaveButton;
 	private Button mShareButton;
-	private Button mDiscardButton;
+	private ImageButton mDiscardButton;
 	private Button mAlarmButton;
 	private ImageView mAlarmRemoveIcon;
 	private ImageView mImgView;
@@ -100,9 +101,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 		});
 		
 		mNoteText = (EditText)findViewById(R.id.edit_note_text);
-		mSaveButton = (Button)findViewById(R.id.edit_note_save);
+		mCancelButton = (ImageButton)findViewById(R.id.edit_note_cancel);
+		mSaveButton = (ImageButton)findViewById(R.id.edit_note_save);
 		mShareButton = (Button)findViewById(R.id.edit_note_share);
-		mDiscardButton = (Button)findViewById(R.id.edit_note_discard);
+		mDiscardButton = (ImageButton)findViewById(R.id.edit_note_discard);
 		mAlarmButton = (Button)findViewById(R.id.edit_note_alarm);
 		mAlarmRemoveIcon = (ImageView)findViewById(R.id.edit_note_alarm_remove);
 		mImgView = (ImageView)findViewById(R.id.edit_note_img);
@@ -111,6 +113,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mAlarmStatus = (TextView)findViewById(R.id.edit_note_alarm_status);
 		mPrayedForStatus = (TextView)findViewById(R.id.edit_note_prayedFor_status);
 
+		mCancelButton.setOnClickListener(this);
 		mSaveButton.setOnClickListener(this);
 		mShareButton.setOnClickListener(this);
 		mDiscardButton.setOnClickListener(this);
@@ -140,10 +143,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 */
 	private void initUI() {
 		if( isNewNote() ) {
-			// Discard button text is "Discard"
-			if( mDiscardButton != null ) {
-				mDiscardButton.setText(R.string.edit_discard_button);
-			}
+			// TODO: hide discard button
 		}
 		else {
 			// Make checkbox elements visible if not a new note
@@ -154,10 +154,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 				mPrayedForStatus.setVisibility(View.VISIBLE);
 			}
 			
-			// Discard button text is "Delete"
-			if( mDiscardButton != null ) {
-				mDiscardButton.setText(R.string.edit_delete_button);
-			}
+			// TODO: show discard button
 		}
 		
 		// If applicable, will fill out UI with the saved note data
@@ -194,9 +191,10 @@ public class PNEditNote extends Activity implements OnClickListener {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-    	super.onCreateOptionsMenu(menu);
-    	menu.add(0, Constants.MENU_CANCEL_ID, 0, R.string.edit_menu_cancel);
-    	return true;
+    	return super.onCreateOptionsMenu(menu);
+    	//TODO: move cancel, save, and delete options into menu?
+    	/*menu.add(0, Constants.MENU_CANCEL_ID, 0, R.string.edit_menu_cancel);
+    	return true;*/
     }
     
     /**
@@ -204,11 +202,11 @@ public class PNEditNote extends Activity implements OnClickListener {
      */
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
-    	switch( item.getItemId() ) {
+    	/*switch( item.getItemId() ) {
     	case Constants.MENU_CANCEL_ID:
     		cancelActivityRequest();
     		return true;
-    	}
+    	}*/
     	return super.onMenuItemSelected(featureId, item);
     }
     
@@ -421,6 +419,9 @@ public class PNEditNote extends Activity implements OnClickListener {
 				exitActivity();
 			else
 				showDialog(Constants.DIALOG_DELETE_NOTE);
+			break;
+		case R.id.edit_note_cancel:
+			cancelActivityRequest();
 			break;
 		case R.id.edit_note_alarm:
 			showDialog(Constants.DIALOG_SET_ALARM);
