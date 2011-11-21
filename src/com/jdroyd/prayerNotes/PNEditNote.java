@@ -28,6 +28,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class PNEditNote extends Activity implements OnClickListener {
@@ -50,6 +51,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private CheckBox mPrayedForCheckBox;
 	private TextView mAlarmStatus;
 	private TextView mPrayedForStatus;
+	private RelativeLayout mImgContainer;
 	
 	// Selected file path of image, if any
 	private String mImgFilePath;
@@ -112,13 +114,13 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mPrayedForCheckBox = (CheckBox)findViewById(R.id.edit_note_prayedFor);
 		mAlarmStatus = (TextView)findViewById(R.id.edit_note_alarm_status);
 		mPrayedForStatus = (TextView)findViewById(R.id.edit_note_prayedFor_status);
+		mImgContainer = (RelativeLayout)findViewById(R.id.edit_note_img_container);
 
 		mCancelButton.setOnClickListener(this);
 		mSaveButton.setOnClickListener(this);
 		mShareButton.setOnClickListener(this);
 		mDiscardButton.setOnClickListener(this);
 		mAlarmButton.setOnClickListener(this);
-		mImgView.setOnClickListener(this);
 		mRemoveImgIcon.setOnClickListener(this);
 		mPrayedForCheckBox.setOnClickListener(this);
 		mAlarmRemoveIcon.setOnClickListener(this);
@@ -426,6 +428,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		case R.id.edit_note_alarm:
 			showDialog(Constants.DIALOG_SET_ALARM);
 			break;
+		// TODO: this needs to be switched to a different button instead
 		case R.id.edit_note_img:
 			startGalleryActivity();
 			break;
@@ -555,25 +558,16 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 * @param strFilePath file path to the image to display
 	 */
 	private void setNoteImageToView(String strFilePath) {
+		if( mImgContainer != null ) {
+			mImgContainer.setVisibility(View.VISIBLE);
+		}
+		
 		if( mImgView != null ) {
-			//TODO: place the values in a resource file instead of using magic numbers
-			float scale = getResources().getDisplayMetrics().density;
-			float newWidth = 120.f * scale;
-			float newHeight = 120.f * scale;
-
 			LayoutParams frame = mImgView.getLayoutParams();
-			frame.width = (int)newWidth;
-			frame.height = (int)newHeight;
-			mImgView.setLayoutParams(frame);
-			
 			int req_size = frame.width > frame.height ? frame.width : frame.height;
 			Bitmap selectedImg = decodeFile(strFilePath, req_size);
 			
 			mImgView.setImageBitmap(selectedImg);
-		}
-		
-		if( mRemoveImgIcon != null ) {
-			mRemoveImgIcon.setVisibility(View.VISIBLE);
 		}
 	}
 	
@@ -655,26 +649,12 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 * updated when state is saved
 	 */
 	private void removeNoteImage() {
-		// Null out file path.  WIll be saved to 
+		// Null out file path 
 		mImgFilePath = null;
 		
-		// Revert image display
-		if( mImgView != null ) {
-			mImgView.setImageResource(R.drawable.img_gallery);
-			
-			//TODO: place the values in a resource file instead of using magic numbers
-			float scale = getResources().getDisplayMetrics().density;
-			float newWidth = 80.f * scale;
-			float newHeight = 80.f * scale;
-			
-			LayoutParams frame = mImgView.getLayoutParams();
-			frame.width = (int)newWidth;
-			frame.height = (int)newHeight;
-			mImgView.setLayoutParams(frame);
-		}
-		
-		if( mRemoveImgIcon != null ) {
-			mRemoveImgIcon.setVisibility(View.INVISIBLE);
+		// Hide image container
+		if( mImgContainer != null ) {
+			mImgContainer.setVisibility(View.GONE);
 		}
 	}
 	
