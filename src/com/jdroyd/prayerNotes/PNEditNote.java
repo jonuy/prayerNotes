@@ -48,12 +48,12 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private ImageView mAlarmRemoveIcon;
 	private ImageView mImgView;
 	private ImageView mRemoveImgIcon;
-	private CheckBox mPrayedForCheckBox;
 	private TextView mAlarmStatus;
 	private TextView mPrayedForStatus;
 	private RelativeLayout mImgContainer;
 	private TextView mImgTextView;
 	private Button mAddImgBtn;
+	private Button mPrayerBtn;
 	
 	// Selected file path of image, if any
 	private String mImgFilePath;
@@ -113,7 +113,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mAlarmRemoveIcon = (ImageView)findViewById(R.id.edit_note_alarm_remove);
 		mImgView = (ImageView)findViewById(R.id.edit_note_img);
 		mRemoveImgIcon = (ImageView)findViewById(R.id.edit_note_img_remove);
-		mPrayedForCheckBox = (CheckBox)findViewById(R.id.edit_note_prayedFor);
+		mPrayerBtn = (Button)findViewById(R.id.edit_note_prayer_btn);
 		mAlarmStatus = (TextView)findViewById(R.id.edit_note_alarm_status);
 		mPrayedForStatus = (TextView)findViewById(R.id.edit_note_prayedFor_status);
 		mImgContainer = (RelativeLayout)findViewById(R.id.edit_note_img_container);
@@ -126,7 +126,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mDiscardButton.setOnClickListener(this);
 		mAlarmButton.setOnClickListener(this);
 		mRemoveImgIcon.setOnClickListener(this);
-		mPrayedForCheckBox.setOnClickListener(this);
+		mPrayerBtn.setOnClickListener(this);
 		mAlarmRemoveIcon.setOnClickListener(this);
 		mAddImgBtn.setOnClickListener(this);
 		
@@ -150,13 +150,10 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 */
 	private void initUI() {
 		if( isNewNote() ) {
-			// TODO: hide discard button
+			// 
 		}
 		else {
-			// Make checkbox elements visible if not a new note
-			if( mPrayedForCheckBox != null ) {
-				mPrayedForCheckBox.setVisibility(View.VISIBLE);
-			}
+			// Make prayer status visible if not a new note
 			if( mPrayedForStatus != null ) {
 				mPrayedForStatus.setVisibility(View.VISIBLE);
 			}
@@ -337,10 +334,6 @@ public class PNEditNote extends Activity implements OnClickListener {
 				mDatePrayed = note.getInt(
 						note.getColumnIndexOrThrow(PNDbAdapter.PNKEY_LAST_PRAYED));
 				if( mDatePrayed > 0 ) {
-					if( mPrayedForCheckBox != null ) {
-						mPrayedForCheckBox.setChecked(true);
-						mPrayedForCheckBox.setText(R.string.checkbox_prayed_success_text);
-					}
 					if( mPrayedForStatus != null && mDbAdapter != null ) {
 						String prayedStatus = 
 							getResources().getText(R.string.last_prayed_for).toString()
@@ -349,10 +342,6 @@ public class PNEditNote extends Activity implements OnClickListener {
 					}
 				}
 				else {
-					if( mPrayedForCheckBox != null ) {
-						mPrayedForCheckBox.setChecked(false);
-						mPrayedForCheckBox.setText(R.string.checkbox_prayed_for_text);
-					}
 					if( mPrayedForStatus != null ) {
 						String prayedStatus = 
 							getResources().getText(R.string.last_prayed_for).toString()
@@ -439,8 +428,8 @@ public class PNEditNote extends Activity implements OnClickListener {
 		case R.id.edit_note_img_remove:
 			removeNoteImage();
 			break;
-		case R.id.edit_note_prayedFor:
-			onNoteIsPrayedFor( ((CheckBox)v).isChecked() );
+		case R.id.edit_note_prayer_btn:
+			onNoteIsPrayedFor();
 			break;
 		case R.id.edit_note_alarm_remove:
 			removeAlarmUI();
@@ -465,6 +454,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 				mDbRowId = id;
 		}
 		else {
+			Log.v(TAG, "mDatePrayed="+mDatePrayed);
 			mDbAdapter.updateNote(mDbRowId, noteText, mImgFilePath, mDatePrayed,
 					mAlarmTime);
 		}
@@ -628,33 +618,16 @@ public class PNEditNote extends Activity implements OnClickListener {
 	 * Called when checkbox is toggled on or off
 	 * @param bIsChecked
 	 */
-	private void onNoteIsPrayedFor(boolean bIsChecked) {
-		if( bIsChecked ) {
-			// Get current time to be saved to database
-			if( mDbAdapter != null )
-				mDatePrayed = mDbAdapter.getCurrentDateForDb();
-			
-			// Display this time to screen
-			if( mPrayedForStatus != null )
-				mPrayedForStatus.setText(
-						getResources().getText(R.string.last_prayed_for).toString()
-						+ mDbAdapter.convertDbDateToString(mDatePrayed));
-			
-			// Change text for checkbox
-			if( mPrayedForCheckBox != null )
-				mPrayedForCheckBox.setText(R.string.checkbox_prayed_success_text);
-		}
-		else {
-			// Reset info if checkbox is unchecked
-			mDatePrayed = 0;
-			
-			if( mPrayedForStatus != null )
-				mPrayedForStatus.setText(
+	private void onNoteIsPrayedFor() {
+		// Get current time to be saved to database
+		if( mDbAdapter != null )
+			mDatePrayed = mDbAdapter.getCurrentDateForDb();
+		
+		// Display this time to screen
+		if( mPrayedForStatus != null ) {
+			mPrayedForStatus.setText(
 					getResources().getText(R.string.last_prayed_for).toString()
-					+ getResources().getText(R.string.date_never).toString());
-			
-			if( mPrayedForCheckBox != null )
-				mPrayedForCheckBox.setText(R.string.checkbox_prayed_for_text);
+					+ mDbAdapter.convertDbDateToString(mDatePrayed));
 		}
 	}
 	

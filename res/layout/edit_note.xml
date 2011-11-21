@@ -138,7 +138,8 @@
 			android:layout_toRightOf="@id/edit_note_alarm_status"
 			android:visibility="gone"/>
 	</RelativeLayout>
-		
+	
+	<!-- Bottom menu bar for Share, Alarm, Image, and Prayer buttons -->
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
