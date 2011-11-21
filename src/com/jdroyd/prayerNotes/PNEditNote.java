@@ -52,6 +52,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private TextView mAlarmStatus;
 	private TextView mPrayedForStatus;
 	private RelativeLayout mImgContainer;
+	private TextView mImgTextView;
 	private Button mAddImgBtn;
 	
 	// Selected file path of image, if any
@@ -116,6 +117,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mAlarmStatus = (TextView)findViewById(R.id.edit_note_alarm_status);
 		mPrayedForStatus = (TextView)findViewById(R.id.edit_note_prayedFor_status);
 		mImgContainer = (RelativeLayout)findViewById(R.id.edit_note_img_container);
+		mImgTextView = (TextView)findViewById(R.id.edit_note_img_name);
 		mAddImgBtn = (Button)findViewById(R.id.edit_note_img_btn);
 
 		mCancelButton.setOnClickListener(this);
@@ -562,6 +564,16 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private void setNoteImageToView(String strFilePath) {
 		if( mImgContainer != null ) {
 			mImgContainer.setVisibility(View.VISIBLE);
+		}
+		
+		if( mImgTextView != null ) {
+			// Try to only display filename, not full path
+			String filename = strFilePath;
+			int lastSlash = strFilePath.lastIndexOf("/");
+			if( lastSlash >= 0 && lastSlash < strFilePath.length() ) {
+				filename = strFilePath.substring(lastSlash+1);
+			}
+			mImgTextView.setText(filename);
 		}
 		
 		if( mImgView != null ) {

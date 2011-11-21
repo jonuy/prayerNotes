@@ -86,6 +86,13 @@
 			android:layout_height="80dp"
 			android:layout_marginLeft="10dp"
 			android:layout_centerVertical="true"/>
+		<TextView android:id="@+id/edit_note_img_name"
+			android:textSize="10sp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dp"
+			android:layout_toRightOf="@id/edit_note_img"
+			android:layout_centerVertical="true"/>
 		<ImageView android:id="@+id/edit_note_img_remove"
 			android:src="@drawable/img_remove_icon"
 			android:layout_width="30dp"
