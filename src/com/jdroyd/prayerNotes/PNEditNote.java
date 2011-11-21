@@ -52,6 +52,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 	private TextView mAlarmStatus;
 	private TextView mPrayedForStatus;
 	private RelativeLayout mImgContainer;
+	private Button mAddImgBtn;
 	
 	// Selected file path of image, if any
 	private String mImgFilePath;
@@ -115,6 +116,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mAlarmStatus = (TextView)findViewById(R.id.edit_note_alarm_status);
 		mPrayedForStatus = (TextView)findViewById(R.id.edit_note_prayedFor_status);
 		mImgContainer = (RelativeLayout)findViewById(R.id.edit_note_img_container);
+		mAddImgBtn = (Button)findViewById(R.id.edit_note_img_btn);
 
 		mCancelButton.setOnClickListener(this);
 		mSaveButton.setOnClickListener(this);
@@ -124,6 +126,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		mRemoveImgIcon.setOnClickListener(this);
 		mPrayedForCheckBox.setOnClickListener(this);
 		mAlarmRemoveIcon.setOnClickListener(this);
+		mAddImgBtn.setOnClickListener(this);
 		
 		// Get row id of note being edited, if any
 		mDbRowId = (savedInstanceState == null) ? null :
@@ -428,8 +431,7 @@ public class PNEditNote extends Activity implements OnClickListener {
 		case R.id.edit_note_alarm:
 			showDialog(Constants.DIALOG_SET_ALARM);
 			break;
-		// TODO: this needs to be switched to a different button instead
-		case R.id.edit_note_img:
+		case R.id.edit_note_img_btn:
 			startGalleryActivity();
 			break;
 		case R.id.edit_note_img_remove:

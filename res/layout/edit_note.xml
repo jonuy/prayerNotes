@@ -113,25 +113,11 @@
 		android:paddingBottom="20dp"
 		android:visibility="gone"/>
 		
-	<LinearLayout
-		android:orientation="horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<Button android:id="@+id/edit_note_share"
-			android:text="@string/edit_share_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"/>
-	</LinearLayout>
-	
+	<!-- Reminder status -->
 	<RelativeLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content">
-		<Button android:id="@+id/edit_note_alarm"
-			android:text="@string/edit_alarm_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"/>
 		<TextView android:id="@+id/edit_note_alarm_status"
-			android:layout_below="@id/edit_note_alarm"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:visibility="gone"
@@ -145,5 +131,27 @@
 			android:layout_toRightOf="@id/edit_note_alarm_status"
 			android:visibility="gone"/>
 	</RelativeLayout>
+		
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		<Button android:id="@+id/edit_note_share"
+			android:text="@string/edit_share_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/edit_note_alarm"
+			android:text="@string/edit_alarm_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/edit_note_img_btn"
+			android:text="Image"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/edit_note_prayer_btn"
+			android:text="Pryr"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+	</LinearLayout>
 	
 </LinearLayout>
